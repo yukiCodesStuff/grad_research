@@ -1,0 +1,45 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 9-10
+VULNERABILITY_DESCRIPTION:
+NullPointerException thrown manually without a clear error message.
+
+EXPLANATION:
+The setInputFile method does not set the readFile variable from the inputFile string. However, the main concern is that the readFromFile method throws a NullPointerException manually when readFile is null. This is not ideal because it obscures the root cause of the exception. NullPointerException is a built-in Java exception that is typically thrown by the Java runtime when there is a null pointer dereference. In this case, throwing it manually may make it more difficult to diagnose the issue.
+
+RECOMMENDATIONS:
+Instead of throwing a NullPointerException, it would be better to throw an IllegalArgumentException or IllegalStateException with a clear error message that explains the problem. Also, the setInputFile method should be updated to correctly set the readFile variable from the inputFile string. Finally, the method should validate the inputFile parameter to prevent setting it to null or empty.
+
+Here's an example of the corrected code:
+```java
+public void setInputFile(String inputFile) {
+    if (inputFile == null || inputFile.isEmpty()) {
+        throw new IllegalArgumentException("Input file cannot be null or empty");
+    }
+    this.readFile = new File(inputFile);
+}
+
+public void readFromFile() {
+    if (readFile == null) {
+        throw new IllegalStateException("Input file has not been set, call setInputFile method before calling openInputFile");
+    }
+    try {
+        reader = new FileReader(readFile);
+        // read input file
+    } catch (FileNotFoundException ex) {...}
+}
+```
+
+ORIGINAL CODE:
+```
+private File readFile = null;
+public void setInputFile(String inputFile) {
+    // create readFile File object from string containing name of file
+}
+public void readFromFile() {
+    try {
+        if (readFile == null) {System.err.println("Input file has not been set, call setInputFile method before calling openInputFile");throw NullPointerException;}
+        reader = new FileReader(readFile);
+        // read input file
+    } catch (FileNotFoundException ex) {...}catch (NullPointerException ex) {...}
+}
+```

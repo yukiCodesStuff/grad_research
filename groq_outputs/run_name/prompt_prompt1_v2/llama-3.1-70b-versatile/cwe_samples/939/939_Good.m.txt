@@ -1,0 +1,46 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2-3
+VULNERABILITY_DESCRIPTION:
+Open URL Vulnerability: This code snippet is vulnerable to an open URL vulnerability. The `openURL` method does not properly vet the provided URL before attempting to open it. However, given the hardcoded nature of this particular URL and the default iOS functionality (allowing certain protocols to open without presenting security risks), there's only potential vulnerability if this code ever shifts to utilize non-hardcoded URLS sourced externally.
+
+
+EXPLANATION:
+The provided code snippet opens a hardcoded URL using the `openURL` method. This itself isn't concerning given the hardcoded and trusted context. However, this might foreshadow future potential for a security vulnerability if said codebase evolved to introduce methods for dynamically determining said URL (accepting data outside the context or directly as code potentially untrustworthy). A malicious actor could craft a malicious URL that takes advantage of this vulnerabilities then. However, as-is, with only a hardcoded link, the entry points for users are limited.
+
+RECOMMENDATIONS:
+In order to ensure security, the code should implement proper URL validation before attempting to open it. Apple has provided guidance in their documentation for how to properly handle opening URLs.
+
+```objc
+- (BOOL)openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options completion:(void (^)(BOOL success))completion {
+    if (url) {
+        NSString *scheme = url.scheme;
+        NSString *hosts = url.host;
+        if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
+            if ([hosts isEqualToString:@"domainyoutrust.com"]) {
+                return [super openURL:url options:options completion:completion];
+            } else {
+                //handle non-expected URL hosts.
+            }
+        }else if ([scheme isEqualToString:@"appscheme"]){
+            // in this particular example "appscheme" appears trusted and is only ever hardcoded, but typically should have better filtering logic than this hardcoded example assuming that is code with a future to be updated
+        }else {
+            // handle unexpected protocols (schemes).
+        }
+    } else {
+        //handle non-URL object
+    }
+}
+```
+
+While not applicable in the hardcoded context, for handling the transition away from hardcoded URLs this demonstrates how to add validation code - be cautious opening URLs that came from non-trusted data sources. 
+
+Moreover, we should continue keeping in mind that iOS handles whitelisting trusted domain names on an App basis via the Info.plist. Furthermore, only specified schemes and HTTP/HTTPS traffic shall be processed through openURL automatically by UIKit; other protocols must include native functionality to not throw exceptions.
+
+
+ORIGINAL CODE:
+
+```objc
+NSString *stringURL = @"appscheme://replaceFileText?file=incomingMessage.txt&text=hello";
+NSURL *url = [NSURL URLWithString:stringURL];
+[[UIApplication sharedApplication] openURL:url];
+```

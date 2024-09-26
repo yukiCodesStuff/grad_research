@@ -1,0 +1,18 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1-3
+VULNERABILITY_DESCRIPTION:
+Predictable and Unbounded Random Number Generation.
+
+EXPLANATION:
+The given code uses a Date's timestamp as a seed for Random number generation and appends the generated random number to a base URL. This makes the generated random number predictable as an attacker can also use the timestamp to generate the same random number. Also, the maximum bound of the random number is 400000000 which is a fixed number, an attacker can try all possible numbers to find a valid receipt URL. 
+
+RECOMMENDATIONS:
+1. Use a cryptographically secure pseudo-random number generator, such as SecureRandom in Java, instead of the Random class.
+2. Use a better seed for the random number generator. Instead of using the current time, consider using a hash of the current time, or a combination of the current time and another value.
+3. Consider using a pepper/hardcoded secret and generate the URL using the pepper and a cryptographically secure random number generator.
+4. Limit the attempts to access a receipt URL to prevent brute-force attacks.
+
+ORIGINAL CODE:
+String GenerateReceiptURL(String baseUrl) {Random ranGen = new Random();ranGen.setSeed((new Date()).getTime());return(baseUrl + ranGen.nextInt(400000000) + ".html");}
+
+Note: While I have recommended a number of improvements, the above assessment reflects the most significant identified vulnerabilities in the code snippet.

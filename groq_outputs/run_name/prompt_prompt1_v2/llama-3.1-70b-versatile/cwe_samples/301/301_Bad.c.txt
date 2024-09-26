@@ -1,0 +1,51 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2-3
+VULNERABILITY_DESCRIPTION:
+The code uses the SHA-1 hashing algorithm, which is considered insecure and vulnerable to collisions.
+
+EXPLANATION:
+The SHA-1 algorithm was broken in 2004 with the discovery of a collision attack that could create two distinct messages with the same hash value. In recent years, attacks on SHA-1 have improved significantly, further decreasing the security of the hash algorithm. Consider using a secure hash function like SHA-256 or SHA-512 instead. Moreover, since we're working with passwords, consider using a key stretching function like Argon2 or PBKDF2 instead of hashing directly.
+
+RECOMMENDATIONS:
+Update the algorithm used in the `generate_password_and_cmd` function to a more secure hash function or key stretching function. Consider the following functions:
+
+- For simple hashing, consider SHA-256 or SHA-512: Replace `"sha1"` with `"sha256"` or `"sha512"`.
+- For password hashing, consider key stretching functions like Argon2 or PBKDF2: Prefer the use of functions that implement key stretching functions.
+
+Here are the example corrections using the current hash functions:
+
+- SHA256:
+```c
+unsigned char *generate_password_and_cmd(char *password_and_cmd) {
+  simple_digest("sha256", password, strlen(password_and_cmd)...)
+}
+```
+
+- SHA-512:
+```c
+unsigned char *generate_password_and_cmd(char *password_and_cmd) {
+  simple_digest("sha512", password, strlen(password_and_cmd)...)
+}
+```
+
+It is also recommended to use the appropriate function prototype to call, as you used in your current system (`EVP_get_digestbyname()`).
+
+ORIGINAL CODE:
+```c
+unsigned char *simple_digest(char *alg, char *buf, unsigned int len, int *olen) {
+  const EVP_MD *m;
+  EVP_MD_CTX ctx;
+  unsigned char *ret;
+  OpenSSL_add_all_digests();
+  if (!(m = EVP_get_digestbyname(alg))) return NULL;
+  if (!(ret = (unsigned char*)malloc(EVP_MAX_MD_SIZE))) return NULL;
+  EVP_DigestInit(&ctx, m);
+  EVP_DigestUpdate(&ctx, buf, len);
+  EVP_DigestFinal(&ctx, ret, olen);
+  return ret;
+}
+
+unsigned char *generate_password_and_cmd(char *password_and_cmd) {
+  simple_digest("sha1", password, strlen(password_and_cmd)...)
+}
+```

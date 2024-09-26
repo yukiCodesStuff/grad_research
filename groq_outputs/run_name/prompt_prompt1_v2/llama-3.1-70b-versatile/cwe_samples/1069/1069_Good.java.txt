@@ -1,0 +1,62 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 6
+VULNERABILITY_DESCRIPTION: Unhandled ArithmeticException due to Missing Null Check
+EXPLANATION:
+The code is attempting to divide 'a' by 'b' without checking whether 'b' is zero. This division by zero will raise an ArithmeticException, which is correctly caught in the code. However, it can be argued that throwing an ArithmeticException from within this method is suboptimal, but what this catch block is missing is a null check for the object 'log'. 
+However, If the object 'log' is null and there are no static import or definition for log, and no logger is defined anywhere and for that 'NullpointerException' will raise. 
+However if log object defined just right above the method or at class level, that should be fine. It would still be 'vulnerable' but to catch ArithmeticException
+
+The main issue here is Missing Null check and Unhandled for 'NullpointerException'
+
+
+RECOMMENDATIONS:
+To avoid the Unhandled Arithmetic Exception and to ensure that the code handles potential null values for the 'log' object, it is recommended to add a null check for the 'log' object before using it in the catch block. Additionally, add code to handle potential Null pointer exception
+
+Here is the corrected code snippet:
+
+```java
+public class Main {
+    public static Logger log; // your logger object
+
+    public static void main(String[] args) {
+        int a = 1;
+        int b = 0;
+        if (b == 0) {
+            System.out.println("Divisor is 0. Please provide a non-zero divisor.");
+        } else {
+            int c = a / b;
+        }
+    }
+    // if we will be Using any catch block we should ensure null check is there.
+    catch (NullPointerException npe) {
+        if (log != null) {
+            log.error("NullPointerException. Setting to -1.");
+        } else {
+            System.out.println("NullPointerException occurred, setting to -1.");
+        }
+    } catch (ArithmeticException ae) {
+        if (log != null) {
+            log.error("Divided by zero detected, setting to -1.");
+        } else {
+            System.out.println("ArithmeticException. Caught an exception!");
+        }
+    }
+}
+```
+
+ORIGINAL CODE:
+```java
+public class Main {
+    public static void main(String[] args) {
+        int a = 1;
+        int b = 0;
+        int c = 0;
+        try {
+            c = a / b;
+        } catch(ArithmeticException ae) {
+            log.error("Divided by zero detected, setting to -1.");
+            c = -1;
+        }
+    }
+}
+```

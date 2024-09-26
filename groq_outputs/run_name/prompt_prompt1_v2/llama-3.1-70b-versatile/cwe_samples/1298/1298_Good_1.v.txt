@@ -1,0 +1,83 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 49-59 
+VULNERABILITY_DESCRIPTION:
+The provided code snippet uses outdated and deprecated SystemVerilog syntax, which can lead to synthesis and simulator portability issues. Specifically, it uses the `//...` comment mechanism to indicate the start of a module or function parameters. This syntax is deprecated in favor of the more explicit `#(...)` syntax.
+
+EXPLANATION:
+The `//...` comment syntax was used in older versions of SystemVerilog to indicate that a module or function parameter list was continuing on the next line. However, this syntax is deprecated in the current version of the SystemVerilog standard (IEEE 1800-2017). The `#(...)` syntax is now the preferred way to extend the parameter list over multiple lines.
+
+RECOMMENDATIONS:
+We recommend updating the code to use the current SystemVerilog syntax for extending module parameters over multiple lines. Instead of using `//...`, we suggest replacing it with `#(...)` to ensure synthesis and simulator portability.
+
+Here is the updated code:
+```verilog
+module dma #( // parameters go here
+    // ...
+) (...);
+```
+However, this recommendation assumes the following comment is continuing module parameters, we cannot confirm that because the snippet does not provide enough context.
+
+Additionally, there is no apparent vulnerability in the provided code snippet from a security perspective. However, we do suggest adding comments to explain the purpose of variables and logic blocks.
+
+ORIGINAL CODE:
+```verilog
+                    module dma # (...)(...);
+                    ...
+                        
+                        input [7:0] [16-1:0] pmpcfg_i;   
+                        input logic [16-1:0][53:0]     pmpaddr_i;
+                        ...
+                        reg [7:0] [16-1:0] pmpcfg_reg;
+                        reg [16-1:0][53:0] pmpaddr_reg;
+                        ...
+                        //// Save the input command
+                        always @ (posedge clk_i or negedge rst_ni)
+							
+                            begin: save_inputs
+                            if (!rst_ni)
+								
+                                begin
+                                ...
+                                pmpaddr_reg <= 'b0 ;
+                                pmpcfg_reg <= 'b0 ;
+                                end
+								
+                            else 
+								
+                                begin
+									
+                                    if (dma_ctrl_reg == CTRL_IDLE || dma_ctrl_reg == CTRL_DONE) 
+                                    begin
+                                    ...
+                                    pmpaddr_reg <= pmpaddr_i;
+                                    pmpcfg_reg <= pmpcfg_i;
+                                    end
+									
+                                end 
+								
+                            end // save_inputs
+                            ...
+                            // Load/store PMP check
+                            pmp #(
+                                
+                                .XLEN       ( 64                     ),
+                                .PMP_LEN    ( 54                     ),
+                                .NR_ENTRIES ( 16           )
+								
+                            ) i_pmp_data (
+                                
+                                .addr_i        ( pmp_addr_reg        ),
+                                .priv_lvl_i    ( riscv::PRIV_LVL_U   ), // we intend to apply filter on
+                                // DMA always, so choose the least privilege
+                                .access_type_i ( pmp_access_type_reg ),
+                                // Configuration
+                                .conf_addr_i   ( pmpaddr_reg           ),
+                                .conf_i        ( pmpcfg_reg            ),
+                                .allow_o       ( pmp_data_allow      )
+								
+                            );
+							
+						
+                    endmodule
+                    
+```

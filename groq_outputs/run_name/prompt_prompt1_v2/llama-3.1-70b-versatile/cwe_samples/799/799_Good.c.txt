@@ -1,0 +1,25 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1-7
+VULNERABILITY_DESCRIPTION:
+Uncontrolled Resource Consumption (Resource Exhaustion) vulnerability.
+EXPLANATION:
+An uncontrolled resource consumption vulnerability can occur in this code when `getNextMessage(socket, username, USERNAME_SIZE)` and/or `getNextMessage(socket, password, PASSWORD_SIZE)` fail to return a non-positive value and the `while` loop continues indefinitely, despite exceeding `MAX_ATTEMPTS`. This is a problem because if `getNextMessage` doesn't behave as expected, the loop could enter a high-iteration state and the `MAX_ATTEMPTS` limit might not be enforced correctly.
+
+RECOMMENDATIONS:
+Instead of simply checking whether `getNextMessage` returns a value greater than zero, add error checking for specific error codes or states and break the loop when an unrecoverable error occurs. To further fix the uncontrolled resource consumption vulnerability, improve the `while` loop condition and reconsider its design: a more idiomatic way to write this loop might be to add a "timeout" or "max retry attempts" variable to limit the number of iterations, rather than letting the condition of `isValidUser == 0` possibly evaluate to true indefinitely.
+
+ORIGINAL CODE:
+int count = 0;
+while ((isValidUser == 0) && (count < MAX_ATTEMPTS)) {
+    if (getNextMessage(socket, username, USERNAME_SIZE) > 0) {
+        if (getNextMessage(socket, password, PASSWORD_SIZE) > 0) {
+            isValidUser = AuthenticateUser(username, password);
+        }
+    }
+    count++;
+}
+if (isValidUser) {
+    return(SUCCESS);
+}else {
+    return(FAIL);
+}

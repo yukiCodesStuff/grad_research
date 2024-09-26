@@ -1,0 +1,30 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 8
+VULNERABILITY_DESCRIPTION:
+This code is vulnerable to a cross-site scripting (XSS) attack through a potential DOM injection vulnerability in the UIWebView. By allowing a potentially malicious URL to be loaded in the web view, an attacker could inject malicious code into the web view, potentially allowing them to steal sensitive data or execute malicious actions.
+
+EXPLANATION:
+The vulnerability is present in the method `webView:shouldStartLoadWithRequest:navigationType:`. The `writeDataToView:` method is used to make data available back in the web view. However, this method is called with user-controlled input, `[URL query]`, which could potentially be malicious. If an attacker were to craft a URL with a malicious query string, they could inject malicious code into the web view when the `writeDataToView:` method is called.
+
+RECOMMENDATIONS:
+To fix this vulnerability, the code should validate the input to the `writeDataToView:` method to ensure it does not contain malicious code. This could be achieved through a combination of input validation and sanitization. Here are some recommended steps:
+
+* Validate the schema of the URL to ensure it matches the expected format.
+* Validate the query string of the URL to ensure it does not contain malicious code.
+* Use a whitelist approach to only allow specific domains or URLs to be loaded in the web view.
+* Avoid using the `writeDataToView:` method with user-controlled input. Instead, use a more secure method to make data available to the web view.
+
+ORIGINAL CODE:
+
+
+// iOS
+-(BOOL) webView:(UIWebView *)exWebView shouldStartLoadWithRequest:(NSURLRequest *)exRequest navigationType:(UIWebViewNavigationType)exNavigationType{
+    NSURL *URL = [exRequest URL];if ([[URL scheme] isEqualToString:@"exampleScheme"]){
+        NSString *functionString = [URL resourceSpecifier];if ([functionString hasPrefix:@"specialFunction"]){
+            
+            // Make data available back in webview.
+            UIWebView *webView = [self writeDataToView:[URL query]];
+        return NO;
+        }return YES;
+    }
+}

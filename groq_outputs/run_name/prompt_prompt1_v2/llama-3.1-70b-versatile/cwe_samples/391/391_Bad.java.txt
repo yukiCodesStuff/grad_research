@@ -1,0 +1,17 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 3-5
+VULNERABILITY_DESCRIPTION:
+Ignoring potential exceptions
+
+EXPLANATION:
+The code snippet provided includes a try-catch block, but the catch block does not contain any meaningful error handling code. It contains a comment stating that an exception can never happen. This is problematic because it may mask potential errors or unexpected conditions. Even if the comment is correct, and the exception should not occur, it is still good practice to log or handle the exception in some way, rather than simply ignoring it.
+
+RECOMMENDATIONS:
+It is recommended that the catch block should contain meaningful error handling code, such as logging the exception or re-throwing it, rather than simply ignoring it. Additionally, the comment should be updated to accurately reflect the expected behavior of the code.
+
+ORIGINAL CODE:
+```
+try {doExchange();}catch (RareException e) {
+    // this can never happen
+}
+```

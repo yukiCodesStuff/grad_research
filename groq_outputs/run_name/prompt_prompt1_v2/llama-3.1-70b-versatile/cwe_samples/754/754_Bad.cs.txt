@@ -1,0 +1,36 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 5-6
+VULNERABILITY_DESCRIPTION: 
+Path Traversal Vulnerability and Disclosure of Sensitive Files
+
+EXPLANATION:
+The code provided appears to be reading files based on user input and storing their contents in a byte array. The filename is constructed by concatenating a predefined directory path (PFILE_ROOT) with the username. This is a clear example of a path traversal vulnerability, as an attacker could manipulate the username to access files outside of the intended directory.
+
+Furthermore, the code reads files without validating their contents. An attacker might be able to create or manipulate a file in the PFILE_ROOT directory to inject malicious data into the system. 
+
+Additionally, this code does not handle exceptions properly, which can lead to further security vulnerabilities.
+
+Additionally, this code does not handle potential exceptions such as IOExceptions and other security exceptions
+
+RECOMMENDATIONS:
+1. Validate user input: Ensure that the username does not contain any malicious characters that could lead to a path traversal vulnerability.
+2. Use a secure method of file access: Instead of directly accessing files based on user input, consider using a white-listed directory and validating the existence of files before attempting to read them.
+3. Sanitize the output: Validate the contents of the file before processing it further.
+4. Implement proper exception handling: Consider catching IOExceptions and other security-related exceptions to prevent further security vulnerabilities.
+5. Consider using a secure method of data storage: Instead of storing file contents in a byte array, consider using a secure data storage mechanism, such as an encrypted database.
+6. Avoid using `string` concatenation for file path construction. Use `Path.Combine` for file path construction.
+
+ORIGINAL CODE:
+
+```csharp
+char[] byteArray = new char[1024]; 
+for (IEnumerator i = users.GetEnumerator(); i.MoveNext(); i.Current())
+{
+    String userName = (String)i.Current();
+    String pFileName = PFILE_ROOT + "/" + userName;
+    StreamReader sr = new StreamReader(pFileName);
+    sr.Read(byteArray, 0, 1024);//the file is always 1k bytes
+    sr.Close();
+    processPFile(userName, byteArray);
+}
+```

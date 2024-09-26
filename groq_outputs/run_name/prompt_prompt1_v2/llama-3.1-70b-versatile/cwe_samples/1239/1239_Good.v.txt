@@ -1,0 +1,64 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 20-23, 30-33 
+VULNERABILITY_DESCRIPTION:
+Possible data exposure through unsecured reset of sensitive data.
+
+EXPLANATION:
+The provided code segment implements a SHA256 I/O memory map interface, specifically handling the write side of the memory map. The code uses an if-else statement to reset certain data variables (data[0] through data[15]) under two conditions: when the system is in a reset state or when a hash becomes valid.
+
+However, this reset operation does not appear to zeroize or clear the sensitive data stored in the data variables securely. Specifically, in lines 20-23 and 30-33, all data variables are reset by assigning them a value of 0 (data[0] <= 0; data[1] <= 0; etc.). This method does not guarantee the secure erasure of sensitive data, potentially allowing attackers to recover sensitive information from the memory.
+
+RECOMMENDATIONS:
+To securely erase sensitive data, it is recommended to use a more comprehensive approach, such as:
+
+*   Using a secure erase function that overwrites the sensitive data with a random or meaningless value
+*   Implementing a memory scrubbing mechanism that ensures the complete erasure of sensitive data from the memory
+*   Using a cryptographically secure wipe method to securely erase the sensitive data
+
+For example:
+
+*   Instead of `data[0] <= 0;`, use a secure erase function like `data[0] <= random_value();` or `data[0] <= meaningless_value();`
+*   Use a memory scrubbing mechanism like `foreach (data[i] in data) { data[i] = random_value(); }`
+
+ORIGINAL CODE:
+
+
+
+```
+...
+	// Implement SHA256 I/O memory map interface
+	// Write side
+	always @(posedge clk_i)
+	
+		begin
+			// Conditional reset
+			if(~(rst_ni && ~rst_3))
+			
+				begin
+					startHash <= 0;
+					newMessage <= 0;
+					data[0] <= 0;
+					data[1] <= 0;
+					data[2] <= 0;
+					...
+					data[14] <= 0;
+					data[15] <= 0;
+					
+				end
+			// Conditional reset when hash becomes valid
+			else if(hashValid && ~hashValid_r)
+			
+				begin
+					data[0] <= 0;
+					data[1] <= 0;
+					data[2] <= 0;
+					...
+					data[14] <= 0;
+					data[15] <= 0;
+					
+				end
+				
+				
+	
+...
+```

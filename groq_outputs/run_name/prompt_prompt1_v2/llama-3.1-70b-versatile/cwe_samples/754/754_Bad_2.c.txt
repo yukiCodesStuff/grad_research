@@ -1,0 +1,29 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 7
+VULNERABILITY_DESCRIPTION: 
+This code is vulnerable to a buffer overflow attack due to the use of strcpy() without checking the length of the source string.
+
+EXPLANATION:
+The vulnerable line is the strcpy() function call, which copies the contents of hp->h_name into the hostname array. However, the hostname array is of fixed size (64 bytes), and the length of hp->h_name is not checked before the copy operation. This allows an attacker to potentially overflow the buffer by inputting a long hostname.
+
+RECOMMENDATIONS:
+To fix this vulnerability, you can use a safer function like strncpy() instead of strcpy(), which allows you to specify a maximum number of bytes to copy. Additionally, the size of the source string and destination buffer should be checked to prevent potential overflows.
+
+Here's an example of how you can modify the code to fix the vulnerability:
+
+```c
+strncpy(hostname, hp->h_name, sizeof(hostname) - 1);
+hostname[sizeof(hostname) - 1] = '\0';
+```
+
+ORIGINAL CODE:
+
+                  void host_lookup(char *user_supplied_addr){
+                        struct hostent *hp;in_addr_t *addr;char hostname[64];in_addr_t inet_addr(const char *cp);
+                           
+                           /*routine that ensures user_supplied_addr is in the right format for conversion */
+                           
+                           validate_addr_form(user_supplied_addr);addr = inet_addr(user_supplied_addr);hp = gethostbyaddr( addr, sizeof(struct in_addr), AF_INET);strcpy(hostname, hp->h_name);
+                     }
+               
+               

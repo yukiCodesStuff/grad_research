@@ -1,0 +1,29 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION: 
+Buffer Overflow Vulnerability.
+
+EXPLANATION: 
+The provided code snippet contains a potential buffer overflow vulnerability in the snprintf function call. The snprintf function copies the contents of argv[1] into the buf array without checking the length of argv[1] against the size of the buf array. However, because the second argument of the snprintf function is the same size as the buffer, this usage actually protects against buffer overflow. 
+
+But that is not to say there are no issues. There are several potential security issues in this code, such as not checking the number of command line arguments, and not checking to make sure that the variable argc is at least 2 before using argv[1].
+
+A careful adversary could still manipulate the number of space allocated on the stack by causing the program to crash when main calls some function on the stack. 
+However there isn't much information regarding buffer overflow with this statement alone. This analysis could be clarified by more snippets of code.
+
+RECOMMENDATIONS: 
+- Validate the number of command line arguments before accessing argv. Specifically, add the following before using argv[1].
+  - Require argc >= 2 before using argv[1].
+- Always use a consistent coding style for arrays or pointers that could help catch errors, like when another programmer is adding or removing an item from a variable.
+- Include the full path for external libraries if they are being used to avoid system problems.
+
+
+ORIGINAL CODE:
+```c
+int main(int argc, char **argv){
+    char buf[128];
+    ...snprintf(buf,128,argv[1]);
+}
+```
+
+The code is vulnerable.

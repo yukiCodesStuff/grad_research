@@ -1,0 +1,22 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2-3
+VULNERABILITY_DESCRIPTION:
+The code snippet contains a potential vulnerability due to the use of the SHA-1 hashing algorithm for password storage. SHA-1 is considered insecure for password storage as it is vulnerable to various attacks, including brute-force attacks and rainbow table attacks.
+
+EXPLANATION:
+In the given code snippet, the `simple_digest` function is used to hash a plaintext password using the SHA-1 algorithm. This hashed password is then compared to a stored hashed password using the `equal` function. However, SHA-1 is considered insecure for password storage due to its weak cryptographic properties. An attacker with access to the hashed password can potentially use techniques like rainbow table attacks or brute-force attacks to recover the original password. Furthermore, the code uses a simple comparison to check for password equality, which may be vulnerable to timing attacks.
+
+RECOMMENDATIONS:
+To fix this vulnerability, consider the following recommendations:
+1. Use a stronger hashing algorithm: Replace SHA-1 with a stronger algorithm like Argon2, PBKDF2, or Bcrypt, which are designed specifically for password storage.
+2. Use a secure comparison function: Use a constant-time comparison function, like `bcrypt_safe_equals`, to prevent timing attacks.
+3. Implement additional security measures: Consider implementing additional security measures, such as salting, peppered hashing, or authentication protocols like OAuth or JWT.
+
+ORIGINAL CODE:
+unsigned char *check_passwd(char *plaintext) {
+    ctext = simple_digest("sha1",plaintext,strlen(plaintext), ... );
+    //Login if hash matches stored hash
+    if (equal(ctext, secret_password())) {
+        login_user();
+    }
+}

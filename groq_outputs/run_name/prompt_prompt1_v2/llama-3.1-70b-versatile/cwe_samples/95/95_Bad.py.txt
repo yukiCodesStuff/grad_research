@@ -1,0 +1,36 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 5
+VULNERABILITY_DESCRIPTION:
+The code is vulnerable to a Code Injection attack through the use of the built-in `eval()` function with unsanitized user input.
+
+EXPLANATION:
+The `eval()` function in Python evaluates a string as a Python expression, which can lead to security vulnerabilities if the input is not properly sanitized. In this case, the code uses `eval()` to process user input that is expected to be a list of numbers. However, a malicious user can inject arbitrary Python code, potentially allowing them to access and manipulate sensitive data, execute system commands, or cause other types of damage.
+
+RECOMMENDATIONS:
+Instead of using `eval()` to process user input, consider using a safer alternative that can handle the expected input format. For example, you can use the `split()` function to split the input string into a list of numbers, and then use a try-except block to handle any potential errors. Here's an example of how you can do this:
+```python
+def main():
+    sum = 0
+    numbers = input("Enter a space-separated list of numbers: ")
+    try:
+        numbers = [float(num) for num in numbers.split()]
+        for num in numbers:
+            sum = sum + num
+        print(f"Sum of {numbers} = {sum}")
+    except ValueError:
+        print("Invalid input. Please enter a space-separated list of numbers.")
+        
+main()
+```
+In this example, we use a try-except block to catch any `ValueError` exceptions that might occur when attempting to convert the input strings to floats. This way, we can handle invalid input more robustly and safely.
+
+ORIGINAL CODE:
+```
+def main():
+    sum = 0
+    numbers = eval(input("Enter a space-separated list of numbers: "))
+    for num in numbers:
+        sum = sum + num
+    print(f"Sum of {numbers} = {sum}")
+main()
+```

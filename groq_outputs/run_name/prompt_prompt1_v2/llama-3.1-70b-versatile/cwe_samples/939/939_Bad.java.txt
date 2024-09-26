@@ -1,0 +1,46 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2-3
+VULNERABILITY_DESCRIPTION:
+Insufficient Input Validation and Potential NullPointerException vulnerabilities
+
+EXPLANATION:
+The `shouldOverrideUrlLoading` method is vulnerable to possible input validation issues and potential `NullPointerException` (NPE) due to the usage of `url.substring(0,14)` and `url.substring(14,25)` without checking the length of the `url` parameter beforehand. 
+This could cause a `StringIndexOutOfBoundsException` or a `NullPointerException` if the `url` is null.
+
+Additionally, if the `url` starts with "examplescheme:" but has less than 14 or 25 characters, it may bypass the intended security checks.
+Furthermore, the method directly compares the `url` with specific strings without sanitizing the input. A malicious actor could potentially manipulate this string and inject malicious data.
+
+RECOMMENDATIONS:
+To fix the potential issues, it is recommended to add proper input validation before processing the `url`.
+
+```java
+// Android
+@Override
+public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    if (url == null) {
+        return true; // or return false, depending on the app's logic
+    }
+    if (url.length() < 25) {
+        return true; // or return false, depending on the app's logic
+    }
+    if (url.startsWith("examplescheme:").toLowerCase()) {
+        String action = url.substring(14);
+        if (action.equalsIgnoreCase("getUserInfo")) {
+            writeDataToView(view, UserData);
+            return false;
+        } else {
+            return true;
+        }
+    }
+    return true;
+}
+```
+Alternatively, consider using a different method for parsing and processing the `url`. 
+
+ORIGINAL CODE:
+```java
+// Android
+@Override public boolean shouldOverrideUrlLoading(WebView view, String url){
+    if (url.substring(0,14).equalsIgnoreCase("examplescheme:")){if(url.substring(14,25).equalsIgnoreCase("getUserInfo")){writeDataToView(view, UserData);return false;}else{return true;}}
+}
+```

@@ -1,0 +1,48 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 3-4
+VULNERABILITY_DESCRIPTION:
+Insecure Increment of a Shared Variable
+EXPLANATION:
+The code snippet contains a shared variable `count` that is incremented in a multithreaded environment. This is vulnerable to a race condition, where multiple threads may read the current value of `count` before any of them have a chance to increment it, resulting in lost updates and inaccurate counts.
+
+In a multithreaded environment like a servlet, multiple threads may be executing the `doGet` method simultaneously. When multiple threads access and modify the shared `count` variable, there is a risk of a race condition occurring. This is because the `count++` operation is not atomic; it involves reading the current value of `count`, incrementing it, and then writing the new value back to `count`. If multiple threads read the current value of `count` before any of them have a chance to write the new value, they will all write the same value, resulting in a lost update.
+
+RECOMMENDATIONS:
+To fix this vulnerability, you should use synchronization mechanisms to ensure that only one thread can access and modify the `count` variable at a time. You can use the `synchronized` keyword in Java to achieve this.
+
+Here's an example of how you can modify the code to fix this vulnerability:
+
+```java
+public static class Counter extends HttpServlet {
+    private static int count = 0;
+
+    protected void doGet(HttpServletRequest in, HttpServletResponse out) throws ServletException, IOException {
+        out.setContentType("text/plain");
+        PrintWriter p = out.getWriter();
+        synchronized (Counter.class) {
+            count++;
+        }
+        p.println(count + " hits so far!");
+    }
+}
+```
+
+Alternatively, you can use an `AtomicInteger` instead of a regular `int` to achieve thread-safe increments.
+
+```java
+public static class Counter extends HttpServlet {
+    private static AtomicInteger count = new AtomicInteger();
+
+    protected void doGet(HttpServletRequest in, HttpServletResponse out) throws ServletException, IOException {
+        out.setContentType("text/plain");
+        PrintWriter p = out.getWriter();
+        count.incrementAndGet();
+        p.println(count.get() + " hits so far!");
+    }
+}
+```
+
+ORIGINAL CODE:
+```java
+public static class Counter extends HttpServlet {static int count = 0;protected void doGet(HttpServletRequest in, HttpServletResponse out)throws ServletException, IOException {out.setContentType("text/plain");PrintWriter p = out.getWriter();count++;p.println(count + " hits so far!");}}
+```

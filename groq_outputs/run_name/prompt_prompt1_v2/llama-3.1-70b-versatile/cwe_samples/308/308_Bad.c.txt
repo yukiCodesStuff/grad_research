@@ -1,0 +1,24 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1-3
+
+VULNERABILITY_DESCRIPTION:
+The code snippet uses SHA1 to hash a password and compare it to a stored hash, which is a vulnerable practice. SHA1 is not considered secure for password storage and can be vulnerable to collision attacks.
+
+EXPLANATION:
+The code uses SHA1 as a hashing algorithm, which has been deemed insecure for password storage. SHA1 has known vulnerabilities, such as collision attacks, which make it possible for an attacker to generate the same hash from different input data. Furthermore, the code does not adhere to the recommended best practices for password storage: using a password hashing algorithm that is resistant to brute-force attacks, such as bcrypt, PBKDF2, or Argon2, and storing a salted hash along with the hashed password.
+
+RECOMMENDATIONS:
+To improve the security of the password storage, we recommend the following:
+
+1. Use a more secure password hashing algorithm, such as bcrypt, PBKDF2, or Argon2. These algorithms are designed to be slow and computationally expensive, which makes them resistant to brute-force attacks.
+2. Store a salt along with the hashed password. The salt should be randomly generated and should be stored separately from the hashed password.
+3. Consider using a secure password hashing library, such as `libsodium` or `Crypto++`, to simplify the process of securely hashing passwords.
+
+ORIGINAL CODE:
+unsigned char *check_passwd(char *plaintext) {
+    ctext = simple_digest("sha1", plaintext, strlen(plaintext), ... );
+    //Login if hash matches stored hash
+    if (equal(ctext, secret_password())) {
+        login_user();
+    }
+}

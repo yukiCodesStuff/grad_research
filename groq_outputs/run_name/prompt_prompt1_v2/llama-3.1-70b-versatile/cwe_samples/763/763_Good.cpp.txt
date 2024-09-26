@@ -1,0 +1,30 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1-5
+VULNERABILITY_DESCRIPTION:
+The code has a potential memory leak due to an exception-unsafe raw pointer.
+
+EXPLANATION:
+The code allocates memory for a `BarObj` using `new` and assigns it to a raw pointer `ptr`. While the code does delete the memory when it's done using it, there's a window of time between the allocation and deletion where an exception could occur. If an exception is thrown during this time, the memory will not be deleted and will result in a memory leak.
+
+RECOMMENDATIONS:
+To address this vulnerability, consider using smart pointers like `unique_ptr` or `shared_ptr` instead of raw pointers. This will ensure that the memory is properly released even if an exception is thrown.
+
+The corrected code could look something like this:
+
+```cpp
+void foo(){
+    std::unique_ptr<BarObj> ptr = std::make_unique<BarObj>();
+    /* do some work with ptr here */
+    ...
+}
+```
+
+ORIGINAL CODE:
+```cpp
+void foo(){
+    BarObj *ptr = new BarObj()
+    /* do some work with ptr here */
+    ...
+    delete ptr;
+}
+```

@@ -1,0 +1,51 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 5-7
+VULNERABILITY_DESCRIPTION:
+Uncaught IOException and potential FileDescriptor leak.
+
+EXPLANATION:
+The given code snippet reads from a file using a FileInputStream and stores the data in a byte array. However, there is no error handling for potential IOExceptions that may occur while reading from the file or closing the FileInputStream. If an IOException is thrown, it can cause the file descriptor to leak, as fis.close() will not be called. This can lead to file descriptor exhaustion, especially if this code is executed multiple times in a loop.
+
+Additionally, the code does not check if the FileInputStream is null before calling its methods. If the FileInputStream is null, a NullPointerException will be thrown.
+
+RECOMMENDATIONS:
+To fix this vulnerability, we recommend the following:
+- Wrap the file reading and closing code in a try-catch block to catch and handle any IOExceptions that may occur.
+- Use a finally block to ensure that the FileInputStream is closed, regardless of whether an exception is thrown.
+- Consider using try-with-resources statement, which ensures that the FileInputStream is closed automatically, even if an exception is thrown.
+- Check if the FileInputStream is null before calling its methods to prevent NullPointerExceptions.
+
+ORIGINAL CODE:
+```java
+FileInputStream fis;byte[] byteArray = new byte[1024];for (Iterator i=users.iterator(); i.hasNext();) {
+    String userName = (String) i.next();
+    String pFileName = PFILE_ROOT + "/" + userName;
+    FileInputStream fis = new FileInputStream(pFileName);fis.read(byteArray); 
+    fis.close();
+    processPFile(userName, byteArray);
+}
+```
+Note: A fixed version of the code might look like this:
+
+```java
+byte[] byteArray = new byte[1024];for (Iterator i=users.iterator(); i.hasNext();) {
+    String userName = (String) i.next();
+    String pFileName = PFILE_ROOT + "/" + userName;
+    FileInputStream fis = null;
+    try {
+        fis = new FileInputStream(pFileName);
+        fis.read(byteArray); 
+        processPFile(userName, byteArray);
+    } catch (IOException e) {
+        // Handle the exception
+    } finally {
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                // Handle the exception
+            }
+        }
+    }
+}
+```

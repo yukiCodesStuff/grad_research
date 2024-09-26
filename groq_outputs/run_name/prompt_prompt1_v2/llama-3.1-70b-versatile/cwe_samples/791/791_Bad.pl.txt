@@ -1,0 +1,21 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1, 3
+VULNERABILITY_DESCRIPTION:
+Path Traversal Vulnerability
+
+EXPLANATION:
+The provided code is vulnerable to a path traversal attack due to the way untrusted user input is handled. In line 1, the "GetUntrustedInput" function retrieves user input and assigns it to the $Username variable. In line 3, this variable is directly concatenated to the string "/home/user/" to create the $filename variable. Although line 2 appears to attempt to mitigate path traversal attacks by removing "../", this is insufficient to prevent all possible traversal attacks. An attacker could potentially create a specially crafted input that bypasses this security check.
+
+Moreover, the variable $Username is retrieved from untrusted input and directly used in constructing the filename. In case an attacker manages to inject unescaped characters like "/./" or "../../" with an offset to the dots to fake bypassing the removal logic in line 2, they may potentially traverse up the directory hierarchy and potentially access unauthorized files.
+
+RECOMMENDATIONS:
+To fix this vulnerability, the application should not directly use untrusted user input to construct file paths. A safer approach is to validate and normalize the input to a known safe directory structure. Here are some steps to mitigate the vulnerability:
+
+1. Implement a whitelist approach: Only allow file access for files that are explicitly declared in a known directory structure.
+
+2. Validate and Normalize Input: If the above approach is not feasible, implement a robust input validation and normalization to disallow access to files outside the application's context. Consider using a library that provides a secure way to construct paths, such as File::Spec in Perl.
+
+3. Avoid Concatenation: Use a template or variable expansion to encode untrusted input correctly.
+
+ORIGINAL CODE:
+                  my $Username = GetUntrustedInput();$Username =~ s/\.\.\///;my $filename = "/home/user/" . $Username;ReadAndSendFile($filename);

@@ -1,0 +1,15 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION: 
+Insecure Direct Object Reference (IDOR) and potential logging of sensitive information.
+
+EXPLANATION: 
+The code is directly logging a user's street address, which is sensitive information. This could potentially lead to data breaches if the log is not properly secured. Furthermore, the use of `logger.info` with a user-provided value could lead to a potential IDOR vulnerability, where an attacker could inject malicious data into the logging system.
+
+RECOMMENDATIONS:
+- Use a secure logging mechanism that properly handles sensitive information.
+- Avoid directly logging user-provided values. Instead, use a logging library that allows you to anonymize or mask sensitive information.
+- Consider using a logging level that is not normally stored in the log output, such as DEBUG or TRACE, for this type of information.
+
+ORIGINAL CODE:
+Logger.info("User's street address: " + request.getParameter("streetAddress"));

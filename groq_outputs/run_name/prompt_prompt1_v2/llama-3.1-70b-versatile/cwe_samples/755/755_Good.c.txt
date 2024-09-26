@@ -1,0 +1,24 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Use of Unchecked Library Functions with Dynamic Memory Allocation
+
+EXPLANATION:
+This code uses `malloc` to allocate memory, but only checks if the allocation failed immediately after. However, there is no validation of the memory allocation size, which is based on `sizeof(char)`. 
+
+This line alone does not contain any critical vulnerability, but it may not follow the 'best practice' approach in a 'production code'. Hence I am marking as vulnerable.
+
+ The size of memory requested is same as the size of a char variable and allocating memory to a variable that can potentially contain a higher amount of data than 'char'. This however does not immediately appear to be the case.
+
+RECOMMENDATIONS:
+Ensure that `malloc` has enough memory. Validate variables which affects memory allocation.
+```c
+    //Example: instead allocating for a certain length, initialize a larger size than you need (as so that when or you expand later you do not have less than needed 
+    int len = 20;
+    char* foo = malloc((len + 1) * sizeof(char));
+    // check if allocation was successful before attempting to use the allocated memory
+    if (foo == NULL) {
+        printf("Malloc failed to allocate memory resources");
+        return -1;
+    }
+```

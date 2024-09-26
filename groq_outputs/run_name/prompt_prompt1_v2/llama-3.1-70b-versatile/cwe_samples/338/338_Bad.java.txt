@@ -1,0 +1,29 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+The use of `Random` class with `System.currentTimeMillis()` as a seed can lead to predictable and insecure random number generation.
+
+EXPLANATION:
+The `System.currentTimeMillis()` function returns the current system time in milliseconds, which can be easily guessed or calculated. Using this value as a seed for the `Random` class can result in predictable random numbers being generated, potentially allowing an attacker to anticipate or replicate the sequence. In the context of generating an `accountID`, this predictability can be detrimental to system security.
+
+RECOMMENDATIONS:
+To generate a secure and unpredictable random number, consider using the `SecureRandom` class instead of `Random`. `SecureRandom` uses an operating system's native random number generation capabilities to produce cryptographically secure random numbers.
+
+```java
+SecureRandom random = new SecureRandom();
+int accountID = random.nextInt();
+```
+
+Alternatively, if you must use the `Random` class, a more secure approach would be to use a cryptographically secure random number as the seed. However, note that even with a secure seed, the `Random` class is not designed to produce cryptographically secure random numbers.
+
+```java
+SecureRandom secureRandom = new SecureRandom();
+long seed = secureRandom.nextLong();
+Random random = new Random(seed);
+int accountID = random.nextInt();
+```
+
+ORIGINAL CODE:
+```java
+Random random = new Random(System.currentTimeMillis());int accountID = random.nextInt();
+```

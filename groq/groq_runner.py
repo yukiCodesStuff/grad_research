@@ -13,9 +13,9 @@ client1 = Groq(
 client2 = Groq(
     api_key = os.getenv('groq_key2')
 )
-client3 = Groq(
-    api_key = os.getenv('groq_key3')
-)
+# client3 = Groq(
+#     api_key = os.getenv('groq_key3')
+# )
 
 def write_resp(pth,resp):
     try:
@@ -32,7 +32,10 @@ def call_groq(msg_content, model_name):
     use_client3 = False
     client3_failed = False
 
+    fileCt = 0
     for i in msg_content:
+        print("Files Groq'd %6d" % fileCt, end='\r')
+        fileCt += 1
         output_file_path = f'groq_outputs/{os.getenv("test_dir")}/prompt_{i[3]}/{model_name}/{i[0]}/{i[1]}.txt'
         if os.path.exists(output_file_path):
             continue
@@ -50,10 +53,10 @@ def call_groq(msg_content, model_name):
                     client2_failed = True
                     chat_completion = client2.chat.completions.create(messages=msg, model=model_name)
                     client2_failed = False  # Reset on success
-                elif use_client3:
-                    client3_failed = True
-                    chat_completion = client3.chat.completions.create(messages=msg, model=model_name)
-                    client3_failed = False  # Reset on success
+                # elif use_client3:
+                #     client3_failed = True
+                #     chat_completion = client3.chat.completions.create(messages=msg, model=model_name)
+                #     client3_failed = False  # Reset on success
 
                 os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
                 write_resp(output_file_path, chat_completion.choices[0].message.content)

@@ -1,0 +1,37 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 8-10
+VULNERABILITY_DESCRIPTION:
+Infinite Loop and Lack of Input Validation
+
+EXPLANATION:
+The code snippet contains a while loop that continues indefinitely if the `getNextMessage` function does not receive any input. This is an infinite loop, as it does not check for any error conditions that would terminate the loop. Furthermore, the code does not validate the input received from the `getNextMessage` function. If this function returns an error or receives malformed input, it may lead to a crash or potential security vulnerabilities in the program.
+
+Additionally, there are potential issues with buffer overflow in lines 5 and 6. The variables `username` and `password` have fixed sizes (`USERNAME_SIZE` and `PASSWORD_SIZE`), but there are no checks on whether the length of the received data exceeds these sizes. However, this may be a false alarm due to the missing code context. 
+
+RECOMMENDATIONS:
+Introduce error checking and handling mechanisms to prevent infinite loops. Implement proper input validation to prevent buffer overflows or crashes due to malformed input. Consider using safer functions for receiving input, and check the lengths of received data against buffer sizes.
+
+To mitigate the infinite loop:
+- Add a timeout to the `getNextMessage` function to prevent waiting indefinitely for input.
+- Implement a retry mechanism with adequate delays to prevent excessive attempts.
+
+To prevent buffer overflows:
+- Use `strncpy` instead of assigning directly to `username` and `password`.
+- Check the length of the received data to prevent writing past the end of the buffer.
+
+To enhance the error handling:
+- Return distinct error codes to differentiate between different types of errors.
+- Consider logging error messages instead of printing them to the console.
+
+ORIGINAL CODE:
+
+
+                  int validateUser(char *host, int port){
+                        int socket = openSocketConnection(host, port);if (socket < 0) {printf("Unable to open socket connection");return(FAIL);}
+                           int isValidUser = 0;char username[USERNAME_SIZE];char password[PASSWORD_SIZE];
+                           while (isValidUser == 0) {
+                              if (getNextMessage(socket, username, USERNAME_SIZE) > 0) {if (getNextMessage(socket, password, PASSWORD_SIZE) > 0) {isValidUser = AuthenticateUser(username, password);}}
+                           }return(SUCCESS);
+                     }
+               
+               

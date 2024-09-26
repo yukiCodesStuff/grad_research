@@ -1,0 +1,13 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+The use of the srand and rand functions to generate session IDs is not cryptographically secure.
+
+EXPLANATION:
+The srand function seeds the random number generator with a user-provided ID, and the rand function generates a random number. However, this approach is not suitable for generating session IDs due to its predictability. An attacker can potentially guess or predict session IDs if they know the user ID. This vulnerability allows for potential Session Fixation attacks.
+
+RECOMMENDATIONS:
+Instead of using srand and rand for generating session IDs, it's recommended to use a cryptographically secure pseudo-random number generator (CSPRNG). Examples of such generators include random_bytes in PHP 7 or openssl_random_pseudo_bytes. When generating session IDs, consider using the uniqueid function with an additional random component or a library that provides a secure way to generate random numbers.
+
+ORIGINAL CODE:
+function generateSessionID($userID){srand($userID);return rand();}

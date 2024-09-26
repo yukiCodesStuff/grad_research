@@ -1,0 +1,66 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 34-38, 60-67
+VULNERABILITY_DESCRIPTION:
+Unsynchronized input and unsanitized configuration data for the pmp module.
+EXPLANATION:
+The code snippet uses an unsynchronized and potentially unsanitized input 'pmpcfg_i' and 'pmpaddr_i' for the pmp module configuration. It passes these inputs directly to the 'i_pmp_data' pmp module without any validation or synchronization. This can lead to vulnerabilities such as race conditions, or if 'pmpcfg_i' and 'pmpaddr_i' are provided by an external input source (like user data), it can lead to a privilege escalation vulnerability, as the input was not checked.
+ 
+Unsynchronized input is observed on line 34-38, which is being passed directly to the pmp module without validation on line 60-67.
+
+RECOMMENDATIONS:
+1. Validate 'pmpcfg_i' and 'pmpaddr_i': Data should be sanitized before being used as an input for pmp module configuration. 
+2. Use a register or a synchronized structure: Ensure the usage of  inputs 'pmpcfg_i' and 'pmpaddr_i' in a synchronized manner within module dma. Adding a temporary holding register to ensure synchronized input and secure updating between clock edges to prevent race condition might be a suitable choice. Use tools and methodologies for input validation if it's generated from user data.
+
+ORIGINAL CODE:
+```
+module dma # (...)(...);
+...
+    
+    input [7:0] [16-1:0] pmpcfg_i;
+    input logic [16-1:0][53:0]     pmpaddr_i;
+    ...
+    //// Save the input command
+    always @ (posedge clk_i or negedge rst_ni)
+        
+        begin: save_inputs
+        if (!rst_ni)
+            
+            begin
+            ...
+            end
+            
+        else
+            
+            begin
+            
+                if (dma_ctrl_reg == CTRL_IDLE || dma_ctrl_reg == CTRL_DONE)
+                begin
+                ...
+                end
+                
+            end
+            
+        end // save_inputs
+        ...
+        // Load/store PMP check
+        pmp #(
+            
+            .XLEN       ( 64                     ),
+            .PMP_LEN    ( 54                     ),
+            .NR_ENTRIES ( 16           )
+            
+        ) i_pmp_data (
+            
+            .addr_i        ( pmp_addr_reg        ),
+            .priv_lvl_i    ( riscv::PRIV_LVL_U   ),
+            .access_type_i ( pmp_access_type_reg ),
+            // Configuration
+            .conf_addr_i   ( pmpaddr_i           ),
+            .conf_i        ( pmpcfg_i            ),
+            .allow_o       ( pmp_data_allow      )
+            
+        );
+        
+    
+endmodule
+```

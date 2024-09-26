@@ -1,0 +1,26 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1-3
+VULNERABILITY_DESCRIPTION:
+The code is vulnerable to string equality checking issues due to incorrect usage of the '==' operator.
+
+EXPLANATION:
+In Java, the '==' operator does not compare the content of the strings but instead checks whether both objects point to the same memory location. In this case, two separate 'String' objects 'str1' and 'str2' are created, each containing the same string "Hello". However, because they are two distinct objects, the '==' check will return false, even if they contain the same content.
+
+RECOMMENDATIONS:
+To correctly compare the content of the strings, use the 'equals()' method provided by the 'String' class. Replace the line with the '==' check with the following code:
+
+```java
+if (str1.equals(str2)) {
+    System.out.println("str1 equals str2");
+}
+```
+
+ORIGINAL CODE:
+
+```java
+String str1 = new String("Hello");
+String str2 = new String("Hello");
+if (str1 == str2) {
+    System.out.println("str1 == str2");
+}
+```

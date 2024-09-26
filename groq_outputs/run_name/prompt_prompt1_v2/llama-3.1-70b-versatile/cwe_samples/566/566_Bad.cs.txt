@@ -1,0 +1,23 @@
+VULNERABLE: NO/YES (Mitigated)
+VULNERABLE_LINES: Line 3, Line 7 / None (but see below)
+VULNERABILITY_DESCRIPTION:
+Potential SQL Injection Vulnerability (Mitigated)
+EXPLANATION:
+A potential SQL Injection vulnerability was identified in the code snippet, but it appears to be mitigated by the use of parameterized queries. However, a vulnerability still exists: the variable 'objCommand' is referenced but has not been assigned a value in this code snippet. It is likely that it should be 'query' instead of 'objCommand'.
+
+The use of `AddWithValue` is generally discouraged in favor of specifying the parameter types, as `AddWithValue` can sometimes lead to overly broad or specific data types.
+
+RECOMMENDATIONS:
+ Change `SqlDataReader objReader = objCommand.ExecuteReader();` to `SqlDataReader objReader = query.ExecuteReader();` to correct the inconsistent variable name.
+
+ Prefer `query.Parameters.Add("@id", SqlDbType.SmallInt).Value = id;` instead of `query.Parameters.AddWithValue("@id", id);` for added type safety.
+
+ORIGINAL CODE:
+```
+conn = new SqlConnection(_ConnectionString);
+conn.Open();
+int16 id = System.Convert.ToInt16(invoiceID.Text);
+SqlCommand query = new SqlCommand( "SELECT * FROM invoices WHERE id = @id", conn);
+query.Parameters.AddWithValue("@id", id);
+SqlDataReader objReader = objCommand.ExecuteReader();
+```

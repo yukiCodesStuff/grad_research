@@ -1,0 +1,58 @@
+VULNERABLE: YES
+VULNERABLE_LINES: LineNumbers cannot be determined (XML code snippet), however, refer to the mask for "phone" which is vulnerable.
+VULNERABILITY_DESCRIPTION:
+The regular expression for the phone number input mask allows for arbitrary input due to a missing anchor at the end of the pattern.
+
+EXPLANATION:
+The mask defined in the phone field uses the pattern `^([0-9]{3})(-)([0-9]{4}|[0-9]{4})$`. However, the pattern seems inconsistent as it only allows phone numbers in the format "XXX-XXXX" and "XXX-XXXX". The anchor `$` is correctly placed at the end of the pattern to prevent extra characters, but the pipe `|` is used inconsistently, offering the same pattern twice, which means one of the "([0-9]{4})" can be safely removed without affecting the mask pattern as `(^[0-9]{3}(-)?([0-9]{4})$)` isn't in this mask. The presented pattern restricts extra number sets and has no issue given that `^[0-9]{3}(-)?[0-9]{4}$`. Only that fact is observed no proper mitigation but would have if an 'unbound' pattern existed.
+
+A more serious and actual concern is that a  basic phone format validation accepts the "XXX-XXXX" format by applying restriction to user input just by using masks `[0-9]{3}(-)?[0-9]{4}` for one phone. However the vulnerability exists in a simple pattern for the US telephone numbers but does not validate all the numbers due to the fact, being restrictive (does not allow flexible input for format "[space], [plus], [Hyphen]". etc).
+
+The security risk level associated with phone mask being non-compliant to allow many other types input could lead to some issues for those not actually dealing with phone num and even when not considering that other input, also being added not a straight out-of-the-box "security vulnerability". And so then must be fixed.
+
+RECOMMENDATIONS:
+To enhance the security of this input field, improve the validation by specifying an additional one on backend service after submitting forms by verifying is: e164 ([+]{1}[0-9]{10,15}). That recommendation should always  being put of pattern. 
+Moreover, allow number formatting by this standard would improve usability too and would be good pattern.
+
+ORIGINAL CODE:
+```xml
+<form-validation>
+    <formset>
+        <form name="RegistrationForm">
+            <field property="name" depends="required">
+                <arg position="0" key="prompt.name"/>
+            </field>
+            <field property="address" depends="required">
+                <arg position="0" key="prompt.address"/>
+            </field>
+            <field property="city" depends="required">
+                <arg position="0" key="prompt.city"/>
+            </field>
+            <field property="state" depends="required,mask">
+                <arg position="0" key="prompt.state"/>
+                <var>
+                    <var-name>mask</var-name>
+                    <var-value>[a-zA-Z]{2}</var-value>
+                </var>
+            </field>
+            <field property="zipcode" depends="required,mask">
+                <arg position="0" key="prompt.zipcode"/>
+                <var>
+                    <var-name>mask</var-name>
+                    <var-value>\d{5}</var-value>
+                </var>
+            </field>
+            <field property="phone" depends="required,mask">
+                <arg position="0" key="prompt.phone"/>
+                <var>
+                    <var-name>mask</var-name>
+                    <var-value>^([0-9]{3})(-)([0-9]{4}|[0-9]{4})$</var-value>
+                </var>
+            </field>
+            <field property="email" depends="required,email">
+                <arg position="0" key="prompt.email"/>
+            </field>
+        </form>
+    </formset>
+</form-validation>
+```

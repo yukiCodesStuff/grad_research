@@ -1,0 +1,34 @@
+VULNERABLE: NO
+VULNERABLE_LINES: None
+VULNERABILITY_DESCRIPTION:
+No vulnerabilities found in the given code snippet.
+
+EXPLANATION:
+The provided code snippet appears to be a part of a RISC-V CSR (Control and Status Register) access control mechanism. It checks for privilege level requirements and raises an exception if the current privilege level does not match the required privilege level for a specific CSR. Additionally, it checks for access to debug mode-only CSRs when the system is not in debug mode. The code is well-structured, and the logic is clear and correct. No obvious vulnerabilities or potential security risks were identified.
+
+RECOMMENDATIONS:
+None.
+
+ORIGINAL CODE:
+
+
+					if (csr_we || csr_read) begin
+						
+							if ((riscv::priv_lvl_t'(priv_lvl_o & csr_addr.csr_decode.priv_lvl) != csr_addr.csr_decode.priv_lvl)) begin
+							
+								csr_exception_o.cause = riscv::ILLEGAL_INSTR;
+								csr_exception_o.valid = 1'b1;
+							
+							end
+							// check access to debug mode only CSRs
+							if (csr_addr_i[11:4] == 8'h7b && !debug_mode_q) begin
+							
+								csr_exception_o.cause = riscv::ILLEGAL_INSTR;
+								csr_exception_o.valid = 1'b1;
+							
+							end
+						
+						end
+						       
+			
+				.

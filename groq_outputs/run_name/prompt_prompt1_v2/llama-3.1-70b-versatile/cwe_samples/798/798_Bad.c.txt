@@ -1,0 +1,35 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2
+VULNERABILITY_DESCRIPTION:
+Uncontrolled Comparison and Insecure Function.
+EXPLANATION:
+This code is vulnerable to uncontrolled comparison and uses an insecure function. 
+The 'strcmp' function is used to compare the user-provided password with the hardcoded string "Mew!". However, if the password is too long, the function may enter a busy-wait loop due to the way 'strcmp' is implemented. This is because 'strcmp' compares the strings byte by byte until it finds a difference or reaches the null character. If an attacker supplies a long password, they can prevent the function from terminating in a timely manner, leading to a potential denial-of-service (DoS) attack.
+
+Moreover, the 'strcmp' function does not provide any security protections against brute-force or timing attacks. In general, functions like 'bcrypt', 'scrypt', or 'PBKDF2' are recommended for password comparisons, as they provide additional security protections.
+
+Additionally, 'printf' is used to print the password to the console, potentially leaking sensitive information. 
+
+Also of note, return(0) has a missing semicolon.
+
+RECOMMENDATIONS:
+Use a secure function for password comparison, such as 'bcrypt', 'scrypt', or 'PBKDF2', to prevent uncontrolled comparison and timing attacks. Replace 'printf' with a secure function to avoid leaking sensitive information. Ensure the function is properly handling potential edge cases and errors. 
+Use the following example of secure code for comparison:
+```c
+if (!bcrypt_verify(hash, user_supplied_password)) {
+    // handle unauthorized attempt
+} else {
+    // handle successful login
+}
+```
+Handle password length to prevent potential DoS attack.
+
+ORIGINAL CODE:
+                  int VerifyAdmin(char *password) {
+                        if (strcmp(password, "Mew!")) {
+                              
+                                 printf("Incorrect Password!\n");return(0);
+                           }printf("Entering Diagnostic Mode...\n");return(1);
+                     }
+               
+               

@@ -1,0 +1,42 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 4, 8-9
+VULNERABILITY_DESCRIPTION:
+Dangling pointer vulnerability and potential memory leak.
+
+EXPLANATION:
+In the provided code snippet, a string is dynamically allocated using `malloc` and then its contents are modified using `strcpy`. However, no error checking is performed to ensure that the allocation was successful. 
+
+Moreover, inside the `while` loop, the `i` variable is used as an index to access the characters of the string. If the allocation fails and `str` is `NULL`, accessing `str[i]` would result in a null pointer dereference.
+
+Furthermore, a potential memory leak is found. If an exception occurs after `malloc` allocates memory and before `free` is called, the dynamically allocated memory would be leaked.
+
+Additionally, there's a dangling pointer vulnerability at line 9 where the pointer `str` is freed and then the `while` loop continues iterating, accessing `str[i]` (even though str has been freed), this is incorrect. The `free` statement should be moved to the end of the function.
+
+RECOMMENDATIONS:
+Perform error checking on memory allocation to ensure that `malloc` was successful.
+Remove the `free` statement inside the loop, and only free the memory at the end of the function.
+Use SMART pointers if possible to avoid raw pointer errors.
+Avoid using `strcpy`, instead, use `strcpy_s` or `strncpy` to avoid potential buffer overflows.
+
+ORIGINAL CODE:
+#define SUCCESS (1)
+#define FAILURE (0)
+int cointains_char(char c){
+    char *str;
+    int i = 0;
+    str = (char*)malloc(20*sizeof(char));
+    strcpy(str, "Search Me!");
+    while( i < strlen(str) ){
+        if( str[i] == c ){
+            
+            /* matched char, free string and return success */
+            free(str);
+            return SUCCESS;
+        }
+        /* didn't match yet, increment pointer and try next char */
+        i = i + 1;
+    }
+    /* we did not match the char in the string, free mem and return failure */
+    free(str);
+    return FAILURE;
+}

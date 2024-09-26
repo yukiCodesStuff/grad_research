@@ -1,0 +1,30 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 11
+VULNERABILITY_DESCRIPTION:
+Format String Vulnerability
+
+EXPLANATION:
+This vulnerability arises from the use of the `printf()` function with a single argument that is a user-controlled (or potentially tainted) string. The `%s` format specifier in `printf()` can be exploited if the string contains additional format specifiers, potentially allowing an attacker to execute arbitrary code. While the string is hardcoded in this case, it's still possible for an attacker to manipulate the format string through other means, such as buffer overflows or user input.
+
+However, this code snippet is particularly concerning because it uses the `test_string` pointer without checking if it was properly initiated. In this case, `test_string` is assigned a value in both paths of the `if-else` statement, but the code snippet does not show any error handling for memory allocation.
+
+RECOMMENDATIONS:
+To address this vulnerability, it is recommended to:
+
+* Use the `puts()` function instead of `printf()` when printing a simple string, as `puts()` does not evaluate format specifiers.
+* Verify that the `test_string` pointer is not null before passing it to `printf()` to avoid a potential segmentation fault.
+* If you need to use `printf()`, consider using a hard-coded format string, and be cautious with user-controlled input.
+
+ORIGINAL CODE:
+
+				char *test_string;
+				if (i != err_val)
+				{
+				test_string = "Hello World!";
+				}
+				else {
+				test_string = "Done on the other side!";
+				}
+				printf("%s", test_string);
+			  
+			

@@ -1,0 +1,16 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Potential serialization vulnerability due to lack of proper serialization handling.
+
+EXPLANATION:
+This code snippet shows a `Customer` class that implements `Serializable`. However, there is no implementation of `readObject()` or `writeObject()` methods, which can lead to security issues if the `Customer` class contains sensitive fields. The `Serializable` interface allows objects of the class to be output and input in a specific binary format, potentially allowing for attacks like "Java Deserialization" if not implemented correctly.
+
+RECOMMENDATIONS:
+Implement the `readObject()` and `writeObject()` methods to handle serialization and deserialization of the `Customer` object properly. Additionally, consider implementing `Serializable` methods like `writeReplace()` and `readResolve()` to enhance security. It is also recommended to use a serialization tool like `Marshaller` or `Unmarshaller` for more secure deserialization. Always handle exceptions properly and only deserialize data from trusted sources.
+
+ORIGINAL CODE:
+
+```java
+public class Customer implements Serializable {...}
+```

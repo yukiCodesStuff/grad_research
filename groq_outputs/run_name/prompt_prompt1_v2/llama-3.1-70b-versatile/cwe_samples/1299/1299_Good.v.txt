@@ -1,0 +1,15 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Hardcoded address values and missing input validation.
+
+EXPLANATION:
+The given line of code contains a hardcoded address comparison, which may lead to potential security issues. The address values 'F00' and '800F00' are directly compared to the 'address' variable without any input validation or sanitization checks. This could potentially allow an attacker to exploit the system by manipulating the 'address' variable to match these hardcoded values.
+
+RECOMMENDATIONS:
+It is recommended to replace the hardcoded address values with configurable or dynamically generated values. Additionally, input validation and sanitization checks should be implemented to ensure that the 'address' variable is within a valid range and does not contain any malicious data. Consider using a secure method to generate and store these address values, such as using a secure configuration file or a secure token.
+
+ORIGINAL CODE:
+```c
+assign addr_auth = (address == 32'hF00 || address == 32'h800F00) ? 1: 0;
+```

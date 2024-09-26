@@ -1,0 +1,21 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Buffer overflow vulnerability due to unbounded use of strcat function.
+
+EXPLANATION:
+The strcat function is used to concatenate strings without checking the length of the destination buffer. This allows an attacker to potentially overflow the buffer by providing a string that exceeds the buffer's capacity. In this example, the code attempts to concatenate the string "hello world" to an uninitialized character array str of size 20. However, there is no guarantee that the resulting string will not exceed the buffer size.
+
+Moreover, the initial content of the str array is undefined, since it is not initialized before the call to strcat. This could potentially lead to additional insecure behavior.
+
+RECOMMENDATIONS:
+To fix this vulnerability, use snprintf or a similar function that allows for specifying the maximum number of bytes to write to the buffer. This will prevent the buffer from overflowing. Additionally, initialize the str array before using it. Here's an example of how the fixed code might look:
+
+ char str[20] = {0}; // Initialize the array
+strncpy(str, "hello world", sizeof(str)); // Use a safer function with a size limit
+printf("%s", str);
+
+Alternatively, consider using a dynamically allocated string or a safer string library like strdup or asprintf.
+
+ORIGINAL CODE:
+char str[20];strcat(str, "hello world");printf("%s", str);

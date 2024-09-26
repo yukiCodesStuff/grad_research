@@ -4,6 +4,12 @@ This repository contains tools and scripts for conducting research with the GROQ
 
 ## Setup
 
+0. **Dependencies**
+  ```
+    pip install python-dotenv
+    pip install groq
+  ```
+
 1. **Environment Configuration**
    - Create a `.env` file in the top-level directory with the following entries:
 

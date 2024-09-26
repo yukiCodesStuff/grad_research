@@ -1,0 +1,25 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Predictable Random Number Generation, Inadequate Security through Obscurity
+
+EXPLANATION:
+The provided code snippet generates a random number and appends it to a base URL, presumably as a unique identifier for a receipt. However, the use of the system time as a seed for the random number generator makes it predictable. An attacker with knowledge of the algorithm and the approximate time the receipt URL was generated could potentially predict the generated number, allowing them to access or manipulate sensitive information.
+
+RECOMMENDATIONS:
+To improve the security of the code, use a cryptographically secure pseudorandom number generator (CSPRNG) instead of the `Random` class. In Java, you can use the `SecureRandom` class for generating secure random numbers.
+
+Here's an example of how you can modify the code to use `SecureRandom`:
+
+```java
+String GenerateReceiptURL(String baseUrl) {
+    SecureRandom secureRandom = new SecureRandom();
+    int RanGen = secureRandom.nextInt(400000000);
+    return(baseUrl + RanGen + ".html");
+}
+```
+
+Additionally, consider using a more secure approach for generating unique identifiers, such as using a UUID (Universally Unique Identifier) library or a cryptographically secure hash function.
+
+ORIGINAL CODE:
+String GenerateReceiptURL(String baseUrl) {Random ranGen = new Random();ranGen.setSeed((new Date()).getTime());return(baseUrl + ranGen.nextInt(400000000) + ".html");};

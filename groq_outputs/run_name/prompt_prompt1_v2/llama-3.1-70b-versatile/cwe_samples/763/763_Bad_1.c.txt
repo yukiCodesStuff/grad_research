@@ -1,0 +1,54 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 7
+VULNERABILITY_DESCRIPTION:
+The vulnerability present in this code is a dangling pointer vulnerability due to the incrementing of the pointer after a string literal has been assigned to a dynamically allocated memory location.
+
+EXPLANATION:
+The code first allocates a memory location for the string using `malloc`, and then assigns a string literal to this location using `strcpy`. However, when the comparison in the `while` loop fails to find a match, the code increments the `str` pointer by one (`str = str + 1;`) instead of using pointer arithmetic (`str++` or `str += 1`) or incrementing the memory address using `&(str[currentIndex])`. This can lead to undefined behavior if `str` is used outside of this context.
+
+Furthermore, the code increments the `str` pointer so that it points to a memory location after the end of the string, which leads to dereferencing past the bounds of the allocated array when checking `*str != NULL` in the loop condition. 
+
+But the most critical issue arises when trying to free the `str` pointer after modifying its value through increments - which leads to undefined behavior as well, because you're trying to `free` memory from an unknown location. This is most likely going to cause your program to crash immediately.
+
+RECOMMENDATIONS:
+To fix this vulnerability, you can change the loop to use an index or pointer arithmetic properly. Additionally, use `str[i]` where `i` is the loop variable to avoid pointer increments.
+
+```c
+int contains_char(char c) {
+    char *str;
+    str = (char*)malloc(20*sizeof(char));
+    strcpy(str, "Search Me!");
+
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+        if (str[i] == c) {
+            free(str);
+            return SUCCESS;
+        }
+    }
+    free(str);
+    return FAILURE;
+}
+```
+
+ORIGINAL CODE:
+```c
+#define SUCCESS (1)
+#define FAILURE (0)
+
+int contains_char(char c){
+    char *str;
+    str = (char*)malloc(20*sizeof(char));
+    strcpy(str, "Search Me!");
+
+    while( *str != NULL){
+        if( *str == c ){
+            free(str);
+            return SUCCESS;
+        } 
+        str = str + 1;
+    }
+    free(str);
+    return FAILURE;
+}
+```

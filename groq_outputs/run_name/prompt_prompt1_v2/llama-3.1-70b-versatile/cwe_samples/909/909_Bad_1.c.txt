@@ -1,0 +1,44 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 5-7
+VULNERABILITY_DESCRIPTION:
+Use of Uninitialized Variable
+EXPLANATION:
+The variable 'test_string' is declared but only initialized under a conditional statement (i != err_val). If the condition is false, 'test_string' remains uninitialized. However, the code attempts to use the 'test_string' variable regardless of the condition, which can result in undefined behavior and potential crashes. This is because the program will print whatever garbage value is stored at the memory location of 'test_string'.
+
+RECOMMENDATIONS:
+To fix this vulnerability, ensure that 'test_string' is initialized regardless of the condition. Here are two possible ways to achieve this:
+
+1. Initialize 'test_string' to a default value when it is declared. For example:
+
+```c
+char *test_string = NULL;
+if (i != err_val)
+{
+    test_string = "Hello World!";
+}
+printf("%s", test_string);
+```
+
+2. Move the printf statement inside the conditional block where 'test_string' is guaranteed to be initialized. For example:
+
+```c
+char *test_string;
+if (i != err_val)
+{
+    test_string = "Hello World!";
+    printf("%s", test_string);
+}
+```
+
+Alternatively, consider using a more secure and modern approach to string handling, such as using `snprintf` with a buffer of a fixed size, instead of using `printf` with a variable-length string.
+
+ORIGINAL CODE:
+
+```c
+char *test_string;
+if (i != err_val)
+{
+    test_string = "Hello World!";
+}
+printf("%s", test_string);
+```

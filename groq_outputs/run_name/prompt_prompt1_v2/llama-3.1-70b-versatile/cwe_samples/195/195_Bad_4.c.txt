@@ -1,0 +1,34 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 8
+VULNERABILITY_DESCRIPTION:
+Integer Overflow Vulnerability leading to Potential Buffer Overflow
+
+EXPLANATION:
+The vulnerability lies in the use of the `returnChunkSize` function in conjunction with `memcpy`. The `returnChunkSize` function returns the size of usable memory for a given chunk, which is then used to copy data from `srcBuf` to `destBuf`. However, the subtraction of 1 from the result of `returnChunkSize(destBuf)` can potentially lead to an integer underflow if `returnChunkSize(destBuf)` returns a small value (e.g., 0 or a small positive integer). This underflow can cause `memcpy` to copy more data than intended, potentially leading to a buffer overflow.
+
+RECOMMENDATIONS:
+To fix this vulnerability, ensure that the result of `returnChunkSize(destBuf)` is validated to prevent integer underflow. Here are some possible fixes:
+
+- Check the return value of `returnChunkSize(destBuf)` before using it to prevent underflow:
+  ```c
+int chunkSize = returnChunkSize(destBuf);
+if (chunkSize > 0) {
+    memcpy(destBuf, srcBuf, chunkSize - 1);
+}
+```
+- Ensure that `returnChunkSize(destBuf)` always returns a value that is at least 1, if the intention is to use it to copy data to `destBuf`. This might involve modifying the `returnChunkSize` function to handle error cases differently.
+
+- Use `size_t` type for variables that hold sizes or indices, which are unsigned and cannot overflow to a smaller value.
+- Use safer functions like `memmove` or `snprintf` to copy data, which do not have issues with underflow.
+
+ORIGINAL CODE:
+```c
+int returnChunkSize(void *) {
+    ...
+}
+int main() {
+    ...
+    memcpy(destBuf, srcBuf, (returnChunkSize(destBuf)-1));
+    ...
+}
+```

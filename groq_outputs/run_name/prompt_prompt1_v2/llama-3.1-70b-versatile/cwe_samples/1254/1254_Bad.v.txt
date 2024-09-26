@@ -1,0 +1,34 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 17, 24
+VULNERABILITY_DESCRIPTION:
+A timing-based side-channel vulnerability is present in this code, potentially allowing attackers to deduce the entered password by measuring the time it takes for the system to grant access.
+
+EXPLANATION:
+The code has a significant vulnerability related to granting access control based on a password. The loop that compares the entered password with the golden password has different execution paths depending on whether the current character matches or not. Specifically, when the characters do not match, the loop breaks, causing the entire grant_access process to terminate prematurely. This premature termination can be exploited by an attacker who can measure the time it takes for the system to respond and deduce the entered password.
+
+RECOMMENDATIONS:
+To fix this vulnerability, it is essential to ensure that both the matching and non-matching paths take the same amount of time. Here's how to address this:
+1. Replace the `break` statement with a continuation to the next iteration.
+2. Move the assignment of `check_pass[i] = 0` outside the loop.
+Additionally, considering introducing noise to the timing to prevent measurement of precise timing.
+
+Alternatively, implementing a speculative or parallel comparison of the password, independent of the outcome, would also help mitigate this side-channel attack.
+
+ORIGINAL CODE:
+```
+always_comb @ (posedge clk)
+begin
+  assign check_pass[3:0] = 4'b0;
+  for (i = 0; i < 4; i++) begin
+    
+    if (entered_pass[(i*8 - 1) : i] == golden_pass[(i*8 - 1) : i])
+      assign check_pass[i] = 1;
+    else
+      assign check_pass[i] = 0;
+  
+  end
+  
+  assign grant_access = (check_pass == 4'b1111) ? 1'b1 : 1'b0;
+  
+end
+```

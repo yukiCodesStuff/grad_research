@@ -1,0 +1,38 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 4-7
+VULNERABILITY_DESCRIPTION:
+The code does not handle the possibility of a null object when calling `new FileReader(readFile)`. This can lead to a `NullPointerException`.
+
+EXPLANATION:
+The code sets `readFile` to `null` and then checks for `FileNotFoundException`, which suggests that it's trying to handle the case where the file does not exist. However, when calling `new FileReader(readFile)`, the code does not check whether `readFile` is `null` first. This can lead to a `NullPointerException` if `setInputFile(String inputFile)` has not been called first or if `readFile` is set to `null` manually.
+
+RECOMMENDATIONS:
+To avoid this vulnerability, the code should check whether `readFile` is `null` before calling `new FileReader(readFile)`. Here's an updated version of `readFromFile()` that includes this check:
+
+```java
+public void readFromFile() {
+    if (readFile != null) {
+        try {
+            reader = new FileReader(readFile);
+            // read input file
+        } catch (FileNotFoundException ex) {...}
+    } else {
+        // Handle the case where readFile is null, e.g., throw a custom exception
+        throw new IllegalStateException("Input file has not been set.");
+    }
+}
+```
+
+ORIGINAL CODE:
+```java
+private File readFile = null;
+public void setInputFile(String inputFile) {
+    // create readFile File object from string containing name of file
+}
+public void readFromFile() {
+    try {
+        reader = new FileReader(readFile);
+        // read input file
+    } catch (FileNotFoundException ex) {...}
+}
+```

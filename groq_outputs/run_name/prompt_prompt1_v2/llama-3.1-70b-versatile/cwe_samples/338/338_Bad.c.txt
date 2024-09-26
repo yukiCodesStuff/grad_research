@@ -1,0 +1,50 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION: 
+Unseeded or poorly seeded pseudo-random number generator (PRNG)
+
+EXPLANATION:
+The provided code snippet initializes a pseudo-random number generator using the `srand` function and the `time` function. However, this approach can be susceptible to predictability issues. While the seed is derived from the system time, using the time as a seed is not recommended because time can be easily guessed or recovered. This could lead to predictable random numbers, compromising the security of the application. 
+
+Moreover, this code does not handle potential errors. If the `srand` function fails, this can result in an undefined state of the random number generator.
+
+RECOMMENDATIONS:
+To address this vulnerability, we recommend seeding the pseudo-random number generator with a high-entropy seed source, such as `/dev/urandom` on Unix-based systems or the `System.Security.Cryptography.RandomNumberGenerator` class in .NET. Handle potential errors to ensure the random number generator is in a defined state.
+
+If using C++, consider:
+
+```cpp
+#include <random>
+#include <fstream>
+
+//...
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_int_distribution<> dis(0, 100);
+int randNum = dis(gen);
+```
+
+If using C with a Unix-based system:
+
+```cpp
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+
+//...
+unsigned int seed;
+int fd = open("/dev/urandom", O_RDONLY);
+if (fd == -1) {
+    // Handle error
+}
+if (read(fd, &seed, sizeof(seed)) != sizeof(seed)) {
+    // Handle error
+}
+srand(seed);
+close(fd);
+```
+
+ORIGINAL CODE:
+```
+srand(time());int randNum = rand();
+```

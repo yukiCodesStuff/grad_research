@@ -1,0 +1,36 @@
+VULNERABLE: NO
+
+VULNERABLE_LINES: None
+
+VULNERABILITY_DESCRIPTION:
+No conventional security vulnerabilities were detected in the code snippet.
+
+EXPLANATION:
+A security vulnerability was implied in this code snippet due to the comment `// glitch in signal z`. However, upon reviewing the code, it does not constitute a typical security vulnerability but rather an electrical engineering-related issue where a signal might 'glitch', i.e., momentarily have an incorrect value before settling to its final value, due to the possible difference in the propagation delay between the two inputs to the OR gate (`and_out1` and `and_out2`). It is not a typical security vulnerability and would be better addressed as a design flaw rather than a vulnerability.
+
+RECOMMENDATIONS:
+To prevent this 'glitching' issue, a more robust approach would be to use a level-sensitive latch, a flip-flop, or other sequential logic to convert the combinational output to a synchronous one, giving time for the errors caused by metastability to settle.
+
+Since this is a typical design issue in digital circuits and not a conventional security vulnerability, no security-focused recommendations are given.
+
+ORIGINAL CODE:
+```
+// 2x1 Multiplexor using logic-gates
+
+module glitchEx(
+    input wire in0, in1, sel,
+    output wire z
+);
+
+wire not_sel;
+wire and_out1, and_out2;
+
+assign not_sel = ~sel;
+assign and_out1 = not_sel & in0;
+assign and_out2 = sel & in1;
+
+// Buggy line of code:
+assign z = and_out1 | and_out2; // glitch in signal z
+
+endmodule
+```

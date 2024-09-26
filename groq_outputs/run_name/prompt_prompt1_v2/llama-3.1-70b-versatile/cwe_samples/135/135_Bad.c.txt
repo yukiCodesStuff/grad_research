@@ -1,0 +1,27 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 10
+VULNERABILITY_DESCRIPTION:
+Incorrect Memory Allocation and Potential Null-Pointer Dereference Vulnerability.
+
+EXPLANATION:
+The code initially attempts to allocate memory for the wide character string using various methods. Although one of the attempts is correct, the others may lead to incorrect results or vulnerabilities. Specifically, in the line `newString = (wchar_t *) malloc(wcslen(wideString) * sizeof(wchar_t));`, the code allocates memory for the wide character string based on the length returned by `wcslen`, which does not include the terminating null character. However, since the line immediately after this is the correct approach, which includes space for the null terminator, this vulnerability is almost eliminated. Nevertheless, as it stands now, `newString` can be assigned to the malformed allocations before the proper allocation supersedes it.
+
+RECOMMENDATIONS:
+Instead of incorrectly allocating memory and then immediately reassigning `newString` to a correct allocation, it's more effective to only allocate memory once with the correct size. Remove lines that attempt to allocate incorrect amounts of memory, and initialize `newString` to `NULL` to prevent potential null-pointer dereferences. More so, upon observing the allocation for `newString`, be aware of the potential memory leak caused by the non-deleted memory after its assignment to another pointer that is initialized from further allocated memory.
+
+ORIGINAL CODE:
+
+
+#include <stdio.h>#include <strings.h>#include <wchar.h>
+int main() {
+    
+wchar_t wideString[] = L"The spazzy orange tiger jumped " "over the tawny jaguar.";
+wchar_t *newString;
+printf("Strlen() output: %d\nWcslen() output: %d\n",strlen(wideString), wcslen(wideString));
+/* Wrong because the number of chars in a string isn't related to its length in bytes //newString = (wchar_t *) malloc(strlen(wideString));*/
+/* Wrong because wide characters aren't 1 byte long! //newString = (wchar_t *) malloc(wcslen(wideString));*/
+/* Wrong because wcslen does not include the terminating null */newString = (wchar_t *) malloc(wcslen(wideString) * sizeof(wchar_t));
+/* correct! */newString = (wchar_t *) malloc((wcslen(wideString) + 1) * sizeof(wchar_t));
+/* ... */
+}
+             

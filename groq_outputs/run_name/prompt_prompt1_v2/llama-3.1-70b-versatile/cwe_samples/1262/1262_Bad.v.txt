@@ -1,0 +1,27 @@
+VULNERABLE: NO
+VULNERABLE_LINES: None
+VULNERABILITY_DESCRIPTION:
+No vulnerabilities detected in the provided code snippet.
+EXPLANATION:
+This code snippet appears to be written in SystemVerilog, a hardware description language. It is checking access control for certain control and status registers (CSRs) in a RISC-V system. The code checks the privilege level and debug mode before granting access to the CSRs. If the access is not allowed, it raises an exception by setting `csr_exception_o.valid` and `csr_exception_o.cause`.
+
+This code seems to follow proper access control and error handling practices, and no apparent vulnerabilities were found within the given snippet.
+
+RECOMMENDATIONS:
+No recommendations for fixing vulnerabilities are provided, as no vulnerabilities were detected.
+
+ORIGINAL CODE:
+```verilog
+if (csr_we || csr_read) begin
+    // check access level for allowed access
+    if ((riscv::priv_lvl_t'(priv_lvl_o & csr_addr.csr_decode.priv_lvl) != csr_addr.csr_decode.priv_lvl) && !(csr_addr.address==riscv::CSR_MEPC)) begin
+        csr_exception_o.cause = riscv::ILLEGAL_INSTR;
+        csr_exception_o.valid = 1'b1;
+    end
+    // check access to debug mode only CSRs
+    if (csr_addr_i[11:4] == 8'h7b && !debug_mode_q) begin
+        csr_exception_o.cause = riscv::ILLEGAL_INSTR;
+        csr_exception_o.valid = 1'b1;
+    end
+end
+```

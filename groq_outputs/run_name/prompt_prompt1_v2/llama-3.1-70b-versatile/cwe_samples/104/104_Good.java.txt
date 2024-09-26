@@ -1,0 +1,20 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 3
+VULNERABILITY_DESCRIPTION:
+The RegistrationForm class does not override the finalize method and does not explicitly close resources in the finalize method. However, since this is a non-IO handling class and given that finalize() is deprecated, a more pressing issue is the usage of a potentially out-of-date and possibly vulnerable library from the year 2001, apache's struts 1.x: 'org.apache.struts.validator.ValidatorForm.'
+
+EXPLANATION:
+The vulnerability score here ranks in severity as medium. The RegistrationForm class's use of the Struts library is concerning, as this software has repeatedly been plagued with issues of SQL injection and even a complete failure of a validation response. The struts library has been kept up to date for quite some time, but any use of Struts 1.x poses too great a risk for an application to expose itself like that if there are safer, and newer alternatives - e.g., Struts 2.x which has repeatedly been hardened with security in mind. Furthermore, not keeping this application's dependencies, namely the Struts library used here up to date poses a much greater security risk than a simple finalize method.
+
+RECOMMENDATIONS:
+It is highly recommended to update the Apache Struts library used here to at least Struts 2.x, as Struts 1.x is stale and vulnerable. Since Security is being kept in check with Apache Struts' newer versions - by migrating from 1.x to a newer Struts library, all of the additional handling for finalizing would come with the upgrade of the library implementation, itself.
+
+ORIGINAL CODE:
+                  public class RegistrationForm extends org.apache.struts.validator.ValidatorForm {
+                     
+                        // private variables for registration formprivate String name;private String email;...
+                           public RegistrationForm() {super();}
+                           public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {...}
+                           // getter and setter methods for private variables...
+                     }
+               

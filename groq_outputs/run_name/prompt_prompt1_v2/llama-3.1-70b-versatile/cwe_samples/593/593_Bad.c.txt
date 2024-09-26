@@ -1,0 +1,35 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 11
+VULNERABILITY_DESCRIPTION:
+ Hardcoded Password and Insecure Default Password Callback.
+
+EXPLANATION:
+The code sets a default password callback using the function `SSL_CTX_set_default_passwd_cb`. This callback function is called when a password is required, for example when loading a private key. However, the password is hardcoded as a string literal ("new default password"). Hardcoding a password directly in the source code is insecure. An attacker who gains access to the source code can obtain the password.
+
+Additionally, this function call will always return an error because it is incorrectly comparing the return value of `SSL_CTX_set_default_passwd_cb` (which is a pointer to a function) to an integer (1).
+
+RECOMMENDATIONS:
+Define password securely. Store passwords securely using environment variables, secure configuration files, or a secrets manager. Never hardcode passwords or sensitive data in your code.
+
+Instead of comparing the callback to an integer, compare it to NULL, as that is what `SSL_CTX_set_default_passwd_cb` will return on failure.
+
+To securely set the callback, define a custom callback function to securely handle password prompts and verification. 
+
+ORIGINAL CODE:
+
+
+                  #define CERT "secret.pem"#define CERT2 "secret2.pem"
+                     int main(){
+                        SSL_CTX *ctx;SSL *ssl;init_OpenSSL();seed_prng();
+                           ctx = SSL_CTX_new(SSLv23_method());
+                           if (SSL_CTX_use_certificate_chain_file(ctx, CERT) != 1)int_error("Error loading certificate from file");
+                           
+                           if (SSL_CTX_use_PrivateKey_file(ctx, CERT, SSL_FILETYPE_PEM) != 1)int_error("Error loading private key from file");
+                           
+                           if (!(ssl = SSL_new(ctx)))int_error("Error creating an SSL context");
+                           
+                           if ( SSL_CTX_set_default_passwd_cb(ctx, "new default password" != 1))int_error("Doing something which is dangerous to do anyways");
+                           
+                           if (!(ssl2 = SSL_new(ctx)))int_error("Error creating an SSL context");
+                        
+                     }

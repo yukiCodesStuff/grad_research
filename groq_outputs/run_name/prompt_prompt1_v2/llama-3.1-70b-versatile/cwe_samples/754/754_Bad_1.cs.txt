@@ -1,0 +1,32 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 4
+VULNERABILITY_DESCRIPTION:
+ Arithmetic Buffer Overread Vulnerability.
+
+EXPLANATION:
+The code snippet is vulnerable to an arithmetic buffer overread vulnerability. In this code, a file is read into a byte array, and then a specific index of the array is used without validation. If the file is smaller than the array, reading from index 20 of the array can result in reading memory outside of the allocated buffer, potentially disclosing sensitive information or causing a crash.
+
+RECOMMENDATIONS:
+To fix this vulnerability, it is essential to verify that the file has been read into the buffer successfully and that the requested index is within the valid bounds of the buffer. Here are some recommended steps:
+1. Check the return value of `MyFile.Read(MyArray, 0, 50)` to verify that 50 bytes were successfully read.
+2. Validate that the requested index is within the valid bounds of the buffer before using it.
+
+Here is an updated example that includes the recommended changes:
+
+```vb
+Dim bytesRead = MyFile.Read(MyArray, 0, 50)
+If bytesRead = 50 Then
+    ' Index 20 is valid in this case
+    DoDangerousOperation(MyArray(20))
+Else
+    ' Handle case where Index 20 is out of bounds
+End If
+```
+
+ORIGINAL CODE:
+```vb
+Dim MyFile As New FileStream("myfile.txt", FileMode.Open, FileAccess.Read, FileShare.Read)
+Dim MyArray(50) As Byte
+MyFile.Read(MyArray, 0, 50)
+DoDangerousOperation(MyArray(20))
+```

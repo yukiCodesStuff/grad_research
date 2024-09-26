@@ -1,0 +1,19 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2, 3, 4
+VULNERABILITY_DESCRIPTION:
+Path Traversal Vulnerability with Unsanitized User Input.
+
+EXPLANATION:
+The code appears to be part of a web application that reads and sends files based on user input (`$Username`). The input is not sanitized properly, and when it starts with '../', the code removes these characters using `substr`. This attempt at sanitization is incomplete and allows for a path traversal vulnerability. An attacker can manipulate the `$Username` variable to traverse the file system, potentially accessing sensitive files that should not be exposed.
+
+The `ReadAndSendFile` function, which is not shown in this snippet, is called with a filename that is constructed by concatenating an unsanitized user input. This allows an attacker to read arbitrary files on the system.
+
+RECOMMENDATIONS:
+1. Implement proper path sanitization: Instead of removing only '../' from the input, ensure that any remaining user-controlled data does not contain any directory traversal characters.
+2. Use a white-list approach: Restrict file access to a specific directory and use only a set of allowed file names and extensions.
+3. Use framework's built-in functionality: Many frameworks offer built-in mechanisms for handling file system interactions and protecting against path traversal attacks.
+
+ORIGINAL CODE:
+
+
+                  my $Username = GetUntrustedInput();if (substr($Username, 0, 3) eq '../') {$Username = substr($Username, 3);}my $filename = "/home/user/" . $Username;ReadAndSendFile($filename);

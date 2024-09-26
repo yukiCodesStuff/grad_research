@@ -1,0 +1,13 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Integer Underflow Vulnerability due to Signed to Unsigned Conversion.
+
+EXPLANATION:
+The code defines a function `readdata()` that returns an `unsigned int` but assigns a negative value (`-1`) to the variable `amount` of type `int` under certain conditions. This signed value is then implicitly converted to `unsigned int` and returned from the function. This signed to unsigned conversion could lead to an integer underflow vulnerability, which can be exploited to bypass security checks or cause unexpected behavior.
+
+RECOMMENDATIONS:
+To fix this vulnerability, consider changing the return type of the function to `int` to match the signed variable `amount`. Alternatively, check the value of `result` and handle the case when it is equal to `ERROR` separately to prevent setting `amount` to a negative value. Also, consider using explicit casting or bounds checking to ensure the correct behavior.
+
+ORIGINAL CODE:
+unsigned int readdata () {int amount = 0;...if (result == ERROR)amount = -1;...return amount;}

@@ -1,0 +1,17 @@
+VULNERABLE: NO
+VULNERABLE_LINES: None
+VULNERABILITY_DESCRIPTION:
+No vulnerability detected.
+
+EXPLANATION:
+The given code snippet defines a private final method `readObject` that throws an `IOException` when called. This method is used for deserialization in Java and is part of the `Serializable` interface. By throwing an exception, the code is preventing the object from being deserialized, which can be a security feature to prevent potential deserialization vulnerabilities.
+
+RECOMMENDATIONS:
+Since the code snippet does not contain any vulnerabilities, no recommendations for fixes are needed. However, a comment explaining why deserialization is being prevented can improve the readability and maintainability of the code.
+
+ORIGINAL CODE:
+```
+private final void readObject(ObjectInputStream in) throws java.io.IOException {
+    throw new java.io.IOException("Cannot be deserialized");
+}
+```

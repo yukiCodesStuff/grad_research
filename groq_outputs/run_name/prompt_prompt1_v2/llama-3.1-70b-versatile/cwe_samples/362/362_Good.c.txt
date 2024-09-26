@@ -1,0 +1,40 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 4
+VULNERABILITY_DESCRIPTION:
+ Use After Free vulnerability due to returning the result of `pthread_mutex_unlock` without checking its return value.
+
+EXPLANATION:
+ The code correctly locks the mutex using `pthread_mutex_lock`, checks its return value, and then accesses the shared resource. However, it then returns the result of `pthread_mutex_unlock` directly. This is problematic because `pthread_mutex_unlock` can return an error if the mutex was not locked by the calling thread, or if it was already unlocked. In this case, if `pthread_mutex_unlock` fails, it's possible that the shared resource was not adequately protected and can be accessed by another thread after it has already been accessed in the current thread, leading to a Use After Free vulnerability.
+
+RECOMMENDATIONS:
+ It's better to assign the return value of `pthread_mutex_unlock` to a variable, check this variable's value, and handle any potential errors. Here is a revised version of the code snippet:
+
+```c
+int f(pthread_mutex_t *mutex) {
+    int result;
+    result = pthread_mutex_lock(mutex);
+    if (0 != result) return result;
+    
+    /* access shared resource */
+    
+    int unlock_result = pthread_mutex_unlock(mutex);
+    if (0 != unlock_result) {
+        // Handle the error
+        // NOTE: You can replace this comment with actual error handling code
+    }
+    return 0;
+}
+```
+
+ORIGINAL CODE:
+
+```c
+int f(pthread_mutex_t *mutex) {
+    int result;
+    result = pthread_mutex_lock(mutex); if (0 != result) return result;
+
+    /* access shared resource */
+
+    return pthread_mutex_unlock(mutex);
+}
+```

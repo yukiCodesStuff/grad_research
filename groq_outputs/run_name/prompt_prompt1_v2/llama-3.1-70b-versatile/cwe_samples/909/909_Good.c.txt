@@ -1,0 +1,21 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 6
+VULNERABILITY_DESCRIPTION: Potential Format String Vulnerability
+
+EXPLANATION:
+This vulnerability is present because the `printf` function is used directly with a user-controlled string. If `test_string` contains format specifiers, such as `%s` or `%d`, it could lead to arbitrary memory reads or writes, potentially causing a denial-of-service or arbitrary code execution.
+
+However, in this particular case, since `test_string` is hardcoded and its values are not derived from user input, the vulnerability may seem minimal. But still, it is recommended to avoid using `printf` with direct user-controlled strings to prevent vulnerabilities in the future if the string source is changed to user input.
+
+RECOMMENDATIONS:
+Use the `printf` function with a bound format string to prevent potential format string vulnerabilities. Instead of `printf("%s", test_string);` use `printf("%s\n", test_string);` and make sure to avoid using format specifiers that might get interpreted by `printf` function.
+
+Alternatively, if you are expecting newline to be included in your string, consider using `puts` for printing strings instead of `printf`.
+
+ORIGINAL CODE:
+	char *test_string = "Done at the beginning";
+	if (i != err_val)
+	{
+		test_string = "Hello World!";
+	}
+	printf("%s", test_string);

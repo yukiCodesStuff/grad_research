@@ -1,0 +1,25 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Infinite resource consumption due to an unhandled exception or uncontrolled infinite loop.
+ 
+EXPLANATION: 
+This code contains a while(true) loop which indicates a potentially infinite loop. The loop does not contain any break condition which could potentially cause the socket to be continuously sending packets. However, there is a more significant vulnerability that arises when the socket encounters an exception. Any exception (e.g., network connectivity issues or the program being unable to send the packet) would typically be expected to break the loop, but in this case, it is missing exception handling and will likely result in infinite resource consumption as it will hang indefinitely, unable to recover from exceptions that may have occurred.
+
+RECOMMENDATIONS:
+1) Implement exception handling within the loop to prevent infinite resource consumption when exceptions occur.
+2) Implement a break condition to avoid consuming all the system's resources indefinitely.
+```
+ while(true) {
+ try {
+  DatagramPacket packet = new DatagramPacket(data,data.length,IPAddress, port);
+   socket.send(sendPacket);
+  } catch (IOException e) {
+   // proper exception handling
+   break;
+ }
+}
+```
+
+ORIGINAL CODE:
+while(true) {DatagramPacket packet = new DatagramPacket(data,data.length,IPAddress, port);socket.send(sendPacket);}

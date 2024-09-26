@@ -1,0 +1,21 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 3-7
+VULNERABILITY_DESCRIPTION:
+The provided code snippet is vulnerable to "Exception Masking" and a "Catch Exception Too Broad" vulnerability.
+EXPLANATION:
+The code catches broad exceptions (`InvocationTargetException` and `SQLException`) without any actual handling or recovery mechanism. This makes it difficult to diagnose and debug the issue when an exception occurs. In the worst-case scenario, this can lead to a situation where an exception is caught, an error log message is printed, and then the code silently continues to run, potentially causing further issues. Furthermore, this implementation risks masking the original exception which can be more significant in its impact. 
+Additionally, `InvocationTargetException` and `SQLException` are checked exceptions and generally we'd want to rethrow or handle them properly.
+RECOMMENDATIONS:
+- Instead of catching broad exceptions like `InvocationTargetException` and `SQLException`, consider catching specific exceptions that are likely to be thrown by `doExchange()`. 
+- For all caught exceptions, include contextual information about what failed in `logger.error()` calls.
+- If `doExchange()` is required to be caught for business reasons, ensure proper error handling or recovery.
+- Consider wrapping `doExchange()` in your own Exception if necessary and rethrow.
+
+ORIGINAL CODE:
+```java
+try {doExchange();}catch (IOException e) {logger.error("doExchange failed", e);}catch (InvocationTargetException e) {
+    logger.error("doExchange failed", e);
+}catch (SQLException e) {
+    logger.error("doExchange failed", e);
+}
+```

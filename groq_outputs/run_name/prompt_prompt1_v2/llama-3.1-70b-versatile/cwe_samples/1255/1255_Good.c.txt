@@ -1,0 +1,36 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 4-5, 6-7, 9-10
+VULNERABILITY_DESCRIPTION:
+Insecure Use of Cryptographic Functions: Timing Attack Vulnerability
+
+EXPLANATION:
+This code snippet contains a timing attack vulnerability. A timing attack occurs when the time it takes for a cryptographic operation to complete can be used to deduce information about the operation or its inputs. In this case, the code contains a subtle timing attack vulnerability through power consumption. The snippet modifies the `password_ok` variable based on the similarity between the entered password and the stored password. The modifications made to `password_ok` in the `for` loop suggest that power consumption ("Power consumption here" comment) and timing ("is now the same here" comment) differ based on the match between the password and stored password. An attacker could exploit this vulnerability by measuring the power consumption or time taken to execute the code, potentially deducing information about the stored password.
+
+RECOMMENDATIONS:
+To fix this vulnerability, ensure that the time taken to execute the code is constant, regardless of the password entered. This can be achieved by:
+
+- Always iterating over all digits of the password, even if they match earlier.
+- Using a secure string comparison function that does not leak timing information, such as `timingsafe_bcmp()` from `openssl`.
+- Avoid using different operations (like bit shifts) based on the match status.
+
+Additionally, consider revising the code to remove unnecessary branches and ensure a consistent execution path for both matching and non-matching password cases.
+
+ORIGINAL CODE:
+```c
+static nonvolatile password_tries = NUM_RETRIES;
+do
+  while (password_tries == 0) ; 
+  password_tries--;  
+  password_ok = 0;
+  for (i = 0; i < NUM_PW_DIGITS; i++)
+    if (GetPasswordByte() == stored_password([i])
+      password_ok |= 0x10; 
+    else
+      password_ok |= 0x01; 
+  end
+  if ((password_ok & 1) == 0)
+    password_tries = NUM_RETRIES;
+    break_to_Ok_to_proceed
+  // Password OK
+  while (true)
+```

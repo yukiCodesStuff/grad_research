@@ -1,0 +1,36 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 9-12
+VULNERABILITY_DESCRIPTION:
+ Unprotected combinational logic in an always block with sensitivity to both clock edge and asynchronous reset.
+
+EXPLANATION:
+This module appears to implement a simple synchronous D flip-flop with an asynchronous reset. However, in the "else" branch, the assignment "q < a;" directly assigns the output 'q' to the input 'a' without any protection. Since this is an asynchronous assignment within an "always" block with sensitivity to both the clock edge and the asynchronous reset, the output 'q' can change during the reset-to-cli simulation phase or during clock glitches. This is potentially unexpected behavior that might be vulnerable to glitch or timing-related attacks.
+
+However, considering a typical VLSI design context where the synchronous operation is restricted to flip-flops and combinational logic, there isn't an explicit vulnerability from an architectural standpoint; we have isolated the operations into different paths gated with either clock conditions or asynchronous reset.
+
+RECOMMENDATIONS:
+ Nevertheless, when using both edge-sensitive and asynchronous logic, such issues can potentially arise due to conflicting asynchronous mechanisms, it is crucial to protect such an asynchronous reset or take special considerations into ensuring this wouldn't interfere with existing timing and simulation analysis in both cli and post-synthesis simulation processes.
+
+ORIGINAL CODE:
+            module siso(clk,rst,a,q);
+	    
+              input a;
+              input clk,rst;
+              output q;
+              reg q;
+              
+              always@(posedge clk,posedge rst)
+              begin
+	      
+		if(rst==1'b1)
+		
+                  q<=1'b0;
+		
+		else
+		
+                  q<=a;
+		
+	      
+              end
+	    
+            endmodule

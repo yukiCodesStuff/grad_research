@@ -1,0 +1,18 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 
+VULNERABILITY_DESCRIPTION: 
+Potential Information Disclosure, weak security practices
+
+EXPLANATION: 
+The presence of 'System.clearProperty("os.name");' followed by 'String os = System.getProperty("os.name");' might be trying to obscure the true operating system of the system. However, this does not address any vulnerabilities directly and could be misleading. Furthermore, the presence of 'System.getProperty("os.name")' could potentially introduce an information disclosure vulnerability. An attacker might be able to exploit this to determine the operating system version that is running the application.
+
+However, a different, stronger vulnerability is the lack of data validation on potentially untrusted data from the operating system ('os' variable in this case), and making a program control decision ('if') based on that variable while not adequately implementing control over security.  If an attacker were able to use a buffer overflow attack for instance or potentially some kind of environment manipulation, the untrusted variable here might theoretically be attacked to subvert security protections.
+
+RECOMMENDATIONS: 
+- Be cautious in using potentially untrusted sources of data to make program control flow decisions.
+- Attempt to securely request this data or maintain internal data stores for potentially untrusted information, avoiding manipulations from an outside source.
+- Validate return values if possible to reduce potential security risks resulting from the data provided to make control flow decisions.
+
+
+ORIGINAL CODE:
+System.clearProperty("os.name");...String os = System.getProperty("os.name");if (os.equalsIgnoreCase("Windows 95")) System.out.println("Not supported");

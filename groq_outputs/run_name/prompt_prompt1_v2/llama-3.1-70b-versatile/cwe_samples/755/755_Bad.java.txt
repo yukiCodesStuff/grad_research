@@ -1,0 +1,25 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 4
+VULNERABILITY_DESCRIPTION:
+The provided code snippet is vulnerable to a DNS Rebinding vulnerability.
+
+EXPLANATION:
+DNS Rebinding attacks allow an attacker to bypass the Same-Origin Policy and make requests to a different domain by utilizing DNS responses. In this case, the code is resolving the client's IP address using `InetAddress.getByName(ip)` and then printing out the hostname. However, if an attacker can manipulate the DNS response for the client's IP address, they could make the server perform unintended actions by resolving the hostname to a different domain.
+
+RECOMMENDATIONS:
+To mitigate this vulnerability, we recommend that you do not resolve the client's IP address to a hostname using `InetAddress.getByName(ip)`. Instead, consider using the client's IP address directly. Additionally, you may want to consider validating the client's IP address against known lists of trusted IP addresses or networks.
+
+If there is a specific requirement to use hostnames, consider implementing additional validation and sanitization steps, such as:
+
+* Validating that the hostname is a trusted hostname.
+* Sanitizing the hostname to prevent unauthorized access to other domains.
+* Implementing rate limiting to prevent abuse.
+
+ORIGINAL CODE:
+```java
+protected void doPost (HttpServletRequest req, HttpServletResponse res) throws IOException {
+    String ip = req.getRemoteAddr();
+    InetAddress addr = InetAddress.getByName(ip);
+    ...out.println("hello " + addr.getHostName());
+}
+```

@@ -1,0 +1,32 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1, 2, 3, 4
+VULNERABILITY_DESCRIPTION: 
+Insecure Hashing Algorithm and Insecure Comparison of Sensitive Information.
+
+EXPLANATION:
+This code snippet is vulnerable to multiple issues related to password hashing and comparison.
+
+Line 1 creates a new String object from the user-provided input (`plainTextIn`). However, this line is not directly related to the vulnerability but could potentially lead to unnecessary exposures of sensitive data in memory.
+
+Lines 2 and 3 use the SHA hashing algorithm, which is insecure for password storage and protection. SHA is a fast hashing algorithm, but its speed can be exploited by attackers to perform brute-force attacks on the password.
+
+Moreover, line 4 incorrectly references `password.digest()` rather than `encer.digest()`, which could lead to unexpected behavior.
+
+The most severe issue lies in lines 3-5, where the code directly compares the hashed user input (`digest`) with the stored hash (`secret_password()`). A direct comparison of sensitive information like this can be vulnerable to timing attacks, which allow an attacker to deduce whether the comparison is matching by measuring the time taken by the comparison operation.
+
+RECOMMENDATIONS:
+- Use a slow and secure password hashing algorithm such as PBKDF2, Argon2, or Bcrypt.
+- Correctly reference the `encer.digest()` method to obtain the hashed value.
+- Avoid direct comparisons of sensitive information like this. Instead, use a secure comparison function that is designed to prevent timing attacks. For instance, use a constant-time comparison function like `java.util.Arrays.equals()` or a secure comparison function from a library like Google's Tink.
+
+ORIGINAL CODE:
+```java
+String plainText = new String(plainTextIn);
+MessageDigest encer = MessageDigest.getInstance("SHA");
+encer.update(plainTextIn);
+byte[] digest = password.digest();
+// Login if hash matches stored hash
+if (equal(digest,secret_password())) {
+    login_user();
+}
+```

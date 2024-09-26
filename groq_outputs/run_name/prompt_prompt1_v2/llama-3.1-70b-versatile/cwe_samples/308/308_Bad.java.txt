@@ -1,0 +1,24 @@
+VULNERABLE: YES
+VULNERABLE_LINES: None (However, I'll identify lines as we go)
+VULNERABILITY_DESCRIPTION: 
+Insecure password storage through the use of SHA-1 hashing and potential incorrect use of MessageDigest methods.
+
+EXPLANATION: 
+The provided code snippet exhibits multiple security concerns related to password storage. 
+
+First, the use of SHA-1 hashing for storing passwords is insecure. SHA-1 is a hashing algorithm, not a password hashing algorithm. It's designed for speed and is not suitable for password storage due to its vulnerability to brute-force attacks. Secure password hashing algorithms like bcrypt, Argon2, or PBKDF2 should be used instead.
+
+Additionally, there is a potential incorrect use of the MessageDigest 'digest' method. The variable name 'encer' is used to refer to the MessageDigest object, which might indicate confusion on the developer's part, but more concerning is using 'password.digest()'. There's no 'password' object declared or defined in the snippet, and it doesn't seem like it should work in this context. Instead, the correct method call should probably be 'encer.digest()'.
+
+Furthermore, there seems to be an insecure method 'equal(digest,secret_password())' for comparing the stored hash with the newly generated one. Secure hash comparisons should be performed using a constant time comparison to avoid timing-based attacks.
+
+RECOMMENDATIONS:
+
+1. Use a secure password hashing algorithm like bcrypt, Argon2, or PBKDF2.
+2. Ensure the MessageDigest object is correctly used to hash the password. It seems the correct method call should be 'encer.digest()'.
+3. Implement a secure method for comparing the stored hash with the newly generated one, using a constant time comparison.
+
+ORIGINAL CODE:
+String plainText = new String(plainTextIn);MessageDigest encer = MessageDigest.getInstance("SHA");encer.update(plainTextIn);byte[] digest = password.digest();
+//Login if hash matches stored hash
+if (equal(digest,secret_password())) {login_user();}

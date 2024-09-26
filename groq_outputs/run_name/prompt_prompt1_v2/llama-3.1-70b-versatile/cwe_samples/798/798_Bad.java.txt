@@ -1,0 +1,15 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 1
+VULNERABILITY_DESCRIPTION:
+Hardcoded database credentials.
+
+EXPLANATION:
+The database connection URL and credentials are hardcoded directly in the source code. This is a major security concern as it allows unauthorized access to the database if the source code or any part of the version control system is compromised. An attacker can obtain sensitive database credentials, potentially leading to data breaches, unauthorized data access, or system compromise.
+
+RECOMMENDATIONS:
+1. Use environment variables or a secure secrets management system to store database credentials.
+2. Load the credentials dynamically, avoiding hardcoding them in the source code.
+3. Use a strong, secure password and consider enabling multi-factor authentication for database access.
+
+ORIGINAL CODE:
+...DriverManager.getConnection(url, "scott", "tiger");...

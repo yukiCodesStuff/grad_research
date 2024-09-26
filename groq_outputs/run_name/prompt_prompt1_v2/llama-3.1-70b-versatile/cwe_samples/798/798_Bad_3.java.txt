@@ -1,0 +1,38 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 3-4
+VULNERABILITY_DESCRIPTION: 
+The code snippet contains a clear-text password and username in a properties file, which is a common practice in Java web applications. 
+
+EXPLANATION: 
+The provided Java Web App ResourceBundle properties file contains sensitive information such as a username and password for an LDAP server. These sensitive values are hardcoded and stored in clear text. This poses a security risk as an attacker with access to the file can easily access the username and password.
+
+RECOMMENDATIONS: 
+To address this vulnerability, it's recommended to:
+
+1.  Remove the clear-text password and username from the properties file.
+2.  Use environment variables or a secrets management system to store sensitive information. This can include tools such as Hashicorp's Vault or AWS Secrets Manager.
+3.  Use Java's built-in API for secure property storage, such as Java KeyStore.
+
+For example:
+
+```java
+System.setProperty("webapp.ldap.username", System.getenv("LDAP_USERNAME"));
+System.setProperty("webapp.ldap.password", System.getenv("LDAP_PASSWORD"));
+```
+
+Alternatively, using a Java KeyStore:
+
+```java
+KeyStore keyStore = KeyStore.getInstance("JKS");
+keyStore.load(null, null);
+
+// Set up the KeyStore properties.
+String username = (String) keyStore.getAttribute("webapp.ldap.username");
+String password = (String) keyStore.getAttribute("webapp.ldap.password");
+```
+
+ORIGINAL CODE:
+
+
+                     # Java Web App ResourceBundle properties file
+                     ...webapp.ldap.username=secretUsernamewebapp.ldap.password=secretPassword...

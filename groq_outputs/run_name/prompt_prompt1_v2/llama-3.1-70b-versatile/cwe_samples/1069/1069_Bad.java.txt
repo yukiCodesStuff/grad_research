@@ -1,0 +1,23 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 7, 8
+VULNERABILITY_DESCRIPTION:
+Arithmetic exception handling is overly permissive, masking potential divide-by-zero errors.
+EXPLANATION:
+The code snippet handles an ArithmeticException but does not take any action. In a real-world application, this could lead to silent failures, where the program continues execution without notifying the user of a problem. However, the main concern is not explicitly handling the divide-by-zero error. The exception is properly caught, but it does not handle potential state changes that could have occurred before the exception was thrown. This could result in unexpected behavior.
+RECOMMENDATIONS:
+Handle the ArithmeticException by either logging or reporting the error, and take corrective action to prevent unexpected behavior. Consider adding a check before performing the division to prevent the exception from occurring in the first place. Also, make sure to handle any potential state changes that could have occurred before the exception was thrown.
+
+ORIGINAL CODE:
+```java
+public class Main {
+   public static void main(String[] args) {
+      int a = 1;
+      int b = 0;
+      int c = 0;
+      try {
+         c = a / b;
+      } catch(ArithmeticException ae) {
+      }
+   }
+}
+```

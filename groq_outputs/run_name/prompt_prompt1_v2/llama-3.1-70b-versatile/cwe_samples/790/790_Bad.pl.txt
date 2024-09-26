@@ -1,0 +1,21 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 2-3
+VULNERABILITY_DESCRIPTION:
+Path Traversal Vulnerability
+
+EXPLANATION:
+The code allows an attacker to traverse directories by manipulating the input to the `$Username` variable. The regular expression `s/\.\.\///` attempts to remove occurrences of ".." from the input. However, this is insufficient to prevent path traversal attacks. An attacker can still inject malicious paths by using techniques such as UNC injection or encoding. Additionally, the use of untrusted input directly in file paths is a security risk.
+
+RECOMMENDATIONS:
+1. Validate and sanitize the `$Username` input to ensure it only contains expected characters and does not contain directory traversal sequences.
+2. Use a whitelist approach to validate the input against a list of known usernames or usernames that match a specific pattern.
+3. Avoid directly concatenating untrusted input into file paths. Instead, use a secure approach to construct file paths that does not allow directory traversal.
+4. Consider using a proven library or framework for file handling that includes built-in protections against path traversal attacks.
+
+ORIGINAL CODE:
+```perl
+my $Username = GetUntrustedInput();
+$Username =~ s/\.\.\///;
+my $filename = "/home/user/" . $Username;
+ReadAndSendFile($filename);
+```

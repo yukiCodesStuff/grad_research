@@ -1,0 +1,16 @@
+VULNERABLE: YES
+VULNERABLE_LINES: None (the vulnerable element is embedded in the XML)
+VULNERABILITY_DESCRIPTION:
+The code contains a hard-coded database password.
+
+EXPLANATION:
+The database connection string contains a hard-coded password ("pwd=password;"). Hard-coding database credentials is a fundamental security vulnerability. An attacker may gain access to the connection string through various means, potentially allowing them to access the database.
+
+RECOMMENDATIONS:
+To fix this vulnerability, we recommend the following:
+1. Store the password securely: Store sensitive data such as passwords in a secure manner, using techniques such as environment variables or secrets management tools.
+2. Use secure configuration management: Implement a secure configuration management approach that separates sensitive information from code, enabling secure storage and management of database credentials.
+3. Use encrypted configuration files: Store encrypted configuration files that are decrypted at runtime to retrieve sensitive information.
+
+ORIGINAL CODE:
+<connectionStrings><add name="ud_DEV" connectionString="connectDB=uDB; uid=db2admin; pwd=password; dbalias=uDB;" providerName="System.Data.Odbc" /></connectionStrings>

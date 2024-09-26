@@ -1,0 +1,31 @@
+VULNERABLE: YES
+VULNERABLE_LINES: 5, 11
+VULNERABILITY_DESCRIPTION:
+The code is vulnerable to a memory leak and potential stack overflow due to the lack of error checking on dynamic memory allocations and copying of user-controlled data.
+
+EXPLANATION:
+The code dynamically allocates memory for the input buffer and the command buffer, but does not check if the memory allocation was successful. If the memory allocation fails, it may result in a memory leak or the program attempting to access invalid memory. Additionally, the code uses `strcpy` to copy user-controlled data into the command buffer, which may result in a stack overflow if the data is longer than the allocated buffer. The `isMalformed` function is checked for the variable `command` which is not initialized before the check, it may also lead to undefined behavior.
+
+RECOMMENDATIONS:
+1. Always check the return value of `malloc` to ensure that the memory allocation was successful. If the allocation fails, handle the error accordingly.
+2. Use `strncpy` instead of `strcpy` to prevent potential buffer overflows when copying user-controlled data.
+3. Ensure that the `command` variable is initialized before checking with `isMalformed`.
+4. Consider using a safer alternative to `strtok` that does not modify the input string.
+
+ORIGINAL CODE:
+```
+//hardcode input length for simplicity
+char* input = (char*) malloc(40*sizeof(char));char *tok, *command;char* sep = " \t";
+get_user_input( input );
+
+/* The following loop will parse and process each token in the input string */
+
+tok = strtok( input, sep);while( NULL != tok ){
+   if( !isMalformed( command ) ){
+         
+         /* copy and enqueue good data */
+         command = (char*) malloc( (strlen(tok) + 1) * sizeof(char) );strcpy( command, tok );add_to_command_queue( command );
+   }tok = strtok( NULL, sep));
+}
+free( input )
+```
